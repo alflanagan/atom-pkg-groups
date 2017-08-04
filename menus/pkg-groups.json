@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle pkg-groups",
+        "command": "pkg-groups:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "pkg-groups",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "pkg-groups:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
