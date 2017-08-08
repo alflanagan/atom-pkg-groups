@@ -1,18 +1,21 @@
 {
   "name": "pkg-groups",
   "main": "./lib/pkg-groups",
-  "version": "0.0.0",
-  "description": "A short description of your package",
+  "version": "0.0.1",
+  "description": "Easily enable/disable packages in groups.",
   "keywords": [
+    "package",
+    "configuration"
   ],
   "activationCommands": {
     "atom-workspace": "pkg-groups:toggle"
   },
-  "repository": "https://github.com/aflanagan/atom-pkg-groups",
+  "repository": "https://github.com/alflanagan/atom-pkg-groups",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
+    "etch": "^0.12.5"
   }
 }

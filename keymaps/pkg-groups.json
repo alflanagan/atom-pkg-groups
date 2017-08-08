@@ -1,5 +1,5 @@
 {
   "atom-workspace": {
-    "ctrl-alt-o": "pkg-groups:toggle"
+    "alt-shift-g": "pkg-groups:toggle"
   }
 }
