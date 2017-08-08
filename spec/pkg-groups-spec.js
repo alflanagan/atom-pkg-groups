@@ -1,4 +1,4 @@
-'use babel';
+/** @babel */
 
 import PkgGroups from '../lib/pkg-groups';
 
@@ -8,37 +8,37 @@ import PkgGroups from '../lib/pkg-groups';
 // or `fdescribe`). Remove the `f` to unfocus the block.
 
 describe('PkgGroups', () => {
-  let workspaceElement, activationPromise;
+  let workspaceElement, activationPromise
 
   beforeEach(() => {
-    workspaceElement = atom.views.getView(atom.workspace);
-    activationPromise = atom.packages.activatePackage('pkg-groups');
-  });
+    workspaceElement = atom.views.getView(atom.workspace)
+    activationPromise = atom.packages.activatePackage('pkg-groups')
+  })
 
   describe('when the pkg-groups:toggle event is triggered', () => {
-    it('hides and shows the modal panel', () => {
+    it('hides and shows the setup panel', () => {
       // Before the activation event the view is not on the DOM, and no panel
       // has been created
-      expect(workspaceElement.querySelector('.pkg-groups')).not.toExist();
+      expect(workspaceElement.querySelector('.pkg-groups')).not.toExist()
 
       // This is an activation event, triggering it will cause the package to be
       // activated.
-      atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle');
+      atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle')
 
       waitsForPromise(() => {
-        return activationPromise;
-      });
+        return activationPromise
+      })
 
       runs(() => {
-        expect(workspaceElement.querySelector('.pkg-groups')).toExist();
+        expect(workspaceElement.querySelector('.pkg-groups')).toExist()
 
-        let pkgGroupsElement = workspaceElement.querySelector('.pkg-groups');
-        expect(pkgGroupsElement).toExist();
+        let pkgGroupsElement = workspaceElement.querySelector('.pkg-groups')
+        expect(pkgGroupsElement).toExist()
 
-        let pkgGroupsPanel = atom.workspace.panelForItem(pkgGroupsElement);
-        expect(pkgGroupsPanel.isVisible()).toBe(true);
-        atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle');
-        expect(pkgGroupsPanel.isVisible()).toBe(false);
+        let pkgGroupsPanel = atom.workspace.panelForItem(pkgGroupsElement)
+        expect(pkgGroupsPanel.isVisible()).toBe(true)
+        atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle')
+        expect(pkgGroupsPanel.isVisible()).toBe(false)
       });
     });
 
