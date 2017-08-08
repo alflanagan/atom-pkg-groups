@@ -20,5 +20,8 @@
   },
   "deserializers": {
     "pkg-groups/PkgGroupsView": "deserializePkgGroupsView"
+  },
+  "devDependencies": {
+    "eslint": "^4.4.1"
   }
 }
