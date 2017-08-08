@@ -1,5 +1,6 @@
 # pkg-groups package
 
-A short description of your package.
+This is an Atom editor package to allow you to create groups of packages, and
+enable/disable them all at once.
 
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+[![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)

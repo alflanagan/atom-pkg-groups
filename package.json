@@ -22,6 +22,12 @@
     "pkg-groups/PkgGroupsView": "deserializePkgGroupsView"
   },
   "devDependencies": {
-    "eslint": "^4.4.1"
+    "standard": "*"
+  },
+  "scripts": {
+    "test": "standard && apm test"
+  },
+  "standard": {
+    "globals": ["atom"]
   }
 }
