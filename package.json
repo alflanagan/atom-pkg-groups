@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "etch": "^0.12.5"
+  },
+  "deserializers": {
+    "pkg-groups/PkgGroupsView": "deserializePkgGroupsView"
   }
 }
