@@ -16,7 +16,8 @@
     "atom": ">=1.19.0 <2.0.0"
   },
   "dependencies": {
-    "etch": "^0.12.5"
+    "etch": "^0.12.6",
+    "immutable": "^3.8.1"
   },
   "deserializers": {
     "pkg-groups/PkgGroupsView": "deserializePkgGroupsView"
