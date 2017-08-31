@@ -1,8 +1,25 @@
 /** @babel */
 
 /* eslint-env jasmine */
+import Immutable from "immutable"
 
-import PkgGroupsModel from '../lib/pkg-groups-model'
+import { PkgGroupsGroup, PkgGroupsMeta, PkgGroupsModel } from '../lib/pkg-groups-model'
+
+fdescribe('PkgGroupsGroup', () => {
+  it('has a name', () => {
+    let fred = new PkgGroupsGroup('fred', [])
+    expect(fred.name).toBe('fred')
+  })
+  it('has a list of packages', () => {
+    let pkgList = ['pkg-groups', 'MagicPython', 'project-manager']
+    let betty = new PkgGroupsGroup('test1', pkgList)
+    expect(betty.name).toBe('test1')
+    expect(betty.packages).toEqual(new Immutable.Set(pkgList))
+    for (let pkg of pkgList) {
+      expect(betty.cont)
+    }
+  })
+})
 
 describe('PkgGroupsModel', () => {
   it('can construct as empty object', () => {
