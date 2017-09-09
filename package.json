@@ -28,6 +28,9 @@
   "scripts": {
     "test": "standard && apm test"
   },
+  "deserializers": {
+    "PkgGroupsView": "deserializePkgGroupsView"
+  },
   "standard": {
     "globals": [
       "atom"
