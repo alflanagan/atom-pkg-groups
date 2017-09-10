@@ -24,10 +24,11 @@ describe('PkgGroupsGroup', () => {
   it('serializes', () => {
     let pkgList = ['pkg-groups', 'MagicPython', 'project-manager']
     let betty = new PkgGroupsGroup('test1', pkgList)
-    let json = betty.toJSON()
+    let data = betty.serialize()
     // rather than test against a string, whose exact form is not guaranteed,
     // parse the string and check resulting object
-    let data = JSON.parse(json)
+    let checkConvert = JSON.stringify(data)
+    expect(checkConvert).toContain('"type":"group"')
     expect(data['type']).toEqual('group')
     expect(data['name']).toEqual('test1')
     expect(data['packages']).toContain('pkg-groups')
@@ -42,7 +43,7 @@ describe('PkgGroupsMeta', () => {
     expect(fred.name).toBe('fred')
   })
 
-  it('can construct from JSON', () => {
+  it('can deserialize', () => {
     let source = '{"name":"fred","type":"meta","states":{"pkg1":"enabled","pkg2":"disabled"}}'
     let fred = new PkgGroupsMeta(source)
     expect(fred.name).toBe('fred')
@@ -52,11 +53,15 @@ describe('PkgGroupsMeta', () => {
     expect(fred.stateOf('pkg2')).toEqual('disabled')
   })
 
-  it('can convert to JSON', () => {
+  it('can serialize', () => {
     let source = '{"name":"fred","type":"meta","states":{"pkg1":"enabled","pkg2":"disabled"}}'
     let fred = new PkgGroupsMeta(source)
-    // a little dangerous since order not guaranteed, but works
-    expect(fred.toJSON()).toEqual(source)
+    let data = fred.serialize()
+    expect(data['name']).toEqual('fred')
+    expect(data['type']).toEqual('meta')
+    expect(data['states']).toBeInstanceOf(Object)
+    expect(data['states']['pkg1']).toEqual('enabled')
+    expect(data['states']['pkg2']).toEqual('disabled')
   })
 })
 
