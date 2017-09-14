@@ -17,19 +17,17 @@
   },
   "dependencies": {
     "etch": "^0.12.6",
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "log4js": "^2.3.3"
   },
   "deserializers": {
-    "pkg-groups/PkgGroupsView": "deserializePkgGroupsView"
+    "PkgGroupsView": "deserializePkgGroupsView"
   },
   "devDependencies": {
     "standard": "*"
   },
   "scripts": {
     "test": "standard && apm test"
-  },
-  "deserializers": {
-    "PkgGroupsView": "deserializePkgGroupsView"
   },
   "standard": {
     "globals": [
