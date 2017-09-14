@@ -2,13 +2,12 @@
 
 /* eslint-env jasmine */
 /* global waitsForPromise */ // missing from jasmine environment
+import log4js from 'log4js'
 
 // import PkgGroups from '../lib/pkg-groups'
 
-// Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
-//
-// To run a specific `it` or `describe` block add an `f` to the front (e.g. `fit`
-// or `fdescribe`). Remove the `f` to unfocus the block.
+const logger = log4js.getLogger('pkg-groups-spec')
+logger.level = 'debug'
 
 describe('PkgGroups', () => {
   let workspaceElement, activationPromise
@@ -28,20 +27,17 @@ describe('PkgGroups', () => {
       // activated.
       atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle')
 
+      // make sure package is activated
       waitsForPromise(() => {
         return activationPromise
       })
 
       runs(() => {
-        expect(workspaceElement.querySelector('.pkg-groups')).toExist()
-
         let pkgGroupsElement = workspaceElement.querySelector('.pkg-groups')
         expect(pkgGroupsElement).toExist()
-
-        let pkgGroupsPanel = atom.workspace.panelForItem(pkgGroupsElement)
-        expect(pkgGroupsPanel.isVisible()).toBe(true)
         atom.commands.dispatch(workspaceElement, 'pkg-groups:toggle')
-        expect(pkgGroupsPanel.isVisible()).toBe(false)
+        pkgGroupsElement = workspaceElement.querySelector('.pkg-groups')
+        expect(pkgGroupsElement).not.toExist()
       })
     })
 
