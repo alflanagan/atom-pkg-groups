@@ -3,7 +3,7 @@
 /* eslint-env jasmine */
 import Immutable from 'immutable'
 
-import PkgGroupsModel, { PkgGroupsGroup, PkgGroupsMeta } from '../lib/pkg-groups-model'
+import PkgGroupsModel, {PkgGroupsGroup, PkgGroupsMeta} from '../lib/pkg-groups-model'
 
 describe('PkgGroupsGroup', () => {
   it('has a name', () => {
@@ -25,8 +25,7 @@ describe('PkgGroupsGroup', () => {
     let pkgList = ['pkg-groups', 'MagicPython', 'project-manager']
     let betty = new PkgGroupsGroup('test1', pkgList)
     let data = betty.serialize()
-    // rather than test against a string, whose exact form is not guaranteed,
-    // parse the string and check resulting object
+    // verify that data is in fact convertible
     let checkConvert = JSON.stringify(data)
     expect(checkConvert).toContain('"type":"group"')
     expect(data['type']).toEqual('group')
@@ -37,9 +36,10 @@ describe('PkgGroupsGroup', () => {
 
 describe('PkgGroupsMeta', () => {
   it('can construct from parameters', () => {
-    let fred = new PkgGroupsMeta(
-      'fred',
-      {'pkg1': 'enabled', 'pkg2': 'enabled'})
+    let fred = new PkgGroupsMeta('fred', {
+      'pkg1': 'enabled',
+      'pkg2': 'enabled'
+    })
     expect(fred.name).toBe('fred')
   })
 
@@ -68,15 +68,30 @@ describe('PkgGroupsMeta', () => {
 describe('PkgGroupsModel', () => {
   it('can construct from object literal', () => {
     let model = new PkgGroupsModel({
-      'group1': {'type': 'group',
-        'name': 'group1',
-        'packages': ['fred', 'sally', 'barney']},
-      'group2': {'type': 'group',
-        'name': 'group2',
-        'packages': ['frank', 'tom', 'dick', 'harry']},
-      'meta1': {'type': 'meta',
-        'name': 'meta1',
-        'states': {'group1': 'enabled', 'group2': 'enabled'}}})
+      groups: [
+        {
+          type: 'group',
+          name: 'group1',
+          packages: ['fred', 'sally', 'barney']
+        }, {
+          type: 'group',
+          name: 'group2',
+          packages: ['frank', 'tom', 'dick', 'harry']
+        }
+      ],
+      metas: [
+        {
+          type: 'meta',
+          name: 'meta1',
+          states: {
+            group1: 'enabled',
+            group2: 'enabled'
+          }
+        }
+      ],
+      enabled: ['meta1'],
+      disabled: ['group2']
+    })
     let names = new Set(model.groupNames)
     expect(names.size).toBe(2)
     expect(names.has('group1')).toBe(true)
