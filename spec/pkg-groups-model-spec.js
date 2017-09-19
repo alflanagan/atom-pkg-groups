@@ -7,8 +7,8 @@ import PkgGroupsModel from '../lib/pkg-groups-model'
 import PkgGroupsGroup from '../lib/pkg-groups-group'
 import PkgGroupsMeta from '../lib/pkg-groups-meta'
 
-const logger = log4js.getLogger('pkg-groups-spec')
-logger.level = 'debug'
+const logger = log4js.getLogger('pkg-groups-model-spec')
+logger.level = 'info'
 
 describe('PkgGroupsModel', () => {
   let model  /* PkgGroupsModel */
@@ -321,12 +321,14 @@ describe('PkgGroupsModel', () => {
   })
 
   describe('differences()', () => {
-    it('returns a map of package names => states', () => {
+    it('returns three sets of packages names', () => {
       let diffs = model3.differences(true)
       expect(diffs.get('enabled').toJS()).toEqual([])
       expect(diffs.get('disabled').size).toEqual(0)
-      expect(diffs.get('missing')).toEqual(
-        new Immutable.Set(['fred', 'sally', 'barney', 'frank', 'tom', 'dick', 'harry']))
+      expect(
+        diffs.get('missing').equals(
+          new Immutable.Set(['fred', 'sally', 'barney', 'frank', 'tom', 'dick', 'harry']))
+      ).toBe(true)
 
       let allPkgNames = atom.packages.getAvailablePackageNames()
       allPkgNames = allPkgNames.filter((x) => atom.packages.isBundledPackage(x))
@@ -334,11 +336,15 @@ describe('PkgGroupsModel', () => {
         bundled: new PkgGroupsGroup('bundled', allPkgNames)
       })
       model3.enabled = new Immutable.Set(['bundled'])
+      expect(model3.groups.has('bundled')).toBe(true)
+      expect(model3.enabled.toJS()).toEqual(['bundled'])
       diffs = model3.differences(true)
       expect(diffs).toBeInstanceOf(Immutable.Map)
       expect(diffs.get('disabled').size).toEqual(0)
       expect(diffs.get('enabled').size).toBeGreaterThan(80)
-      expect(diffs.get('missing')).toEqual(new Immutable.Set(['harry', 'dick', 'tom', 'frank']))
+      expect(
+        diffs.get('missing').equals(
+          new Immutable.Set(['harry', 'dick', 'tom', 'frank']))).toBe(true)
       logger.debug(diffs)
       /**
        * Real problem here. when run under test, all the non-bundled packages are
