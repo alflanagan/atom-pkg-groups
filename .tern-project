@@ -2,13 +2,15 @@
   "ecmaVersion": "7",
   "libs": [],
   "loadEagerly": [
-    "lib/*"
+    "lib/*",
+    "spec/*"
   ],
   "dontLoad": [
     "node_modules/**"
   ],
   "plugins": {
     "doc_comment": true,
+    "node": true,
     "es_modules": {}
   }
 }
