@@ -1,124 +1,19 @@
 /** @babel */
 
 /* eslint-env jasmine */
-/* global waitsForPromise */
-
+import log4js from 'log4js'
 import Immutable from 'immutable'
+import PkgGroupsModel from '../lib/pkg-groups-model'
+import PkgGroupsGroup from '../lib/pkg-groups-group'
+import PkgGroupsMeta from '../lib/pkg-groups-meta'
 
-import PkgGroupsModel, {PkgGroupsGroup, PkgGroupsMeta} from '../lib/pkg-groups-model'
-
-describe('PkgGroupsGroup', () => {
-  let betty
-  const pkgList = ['pkg-groups', 'MagicPython', 'project-manager']
-
-  beforeEach(() => {
-    betty = new PkgGroupsGroup('test1', pkgList)
-  })
-
-  it('has a name', () => {
-    let fred = new PkgGroupsGroup('fred', [])
-    expect(fred.name).toBe('fred')
-  })
-
-  it('has a list of packages', () => {
-    expect(betty.name).toBe('test1')
-    expect(betty.packages).toEqual(new Immutable.Set(pkgList))
-    for (let pkg of pkgList) {
-      expect(betty.has(pkg))
-    }
-  })
-
-  it('serializes', () => {
-    let data = betty.serialize()
-    // verify that data is in fact convertible
-    let checkConvert = JSON.stringify(data)
-    expect(checkConvert).toContain('"type":"group"')
-    expect(data['type']).toEqual('group')
-    expect(data['name']).toEqual('test1')
-    expect(data['packages']).toContain('pkg-groups')
-  })
-
-  it('can call a function with each package', () => {})
-})
-
-describe('PkgGroupsMeta', () => {
-  describe('constructor()', () => {
-    it('can construct from parameters', () => {
-      let fred = new PkgGroupsMeta('fred', {
-        'pkg1': 'enabled',
-        'pkg2': 'enabled'
-      })
-      expect(fred.name).toBe('fred')
-      expect(fred._states.toJS()).toEqual({'pkg1': 'enabled', 'pkg2': 'enabled'})
-    })
-
-    it('can construct from object literal', () => {
-      let fred = new PkgGroupsMeta({
-        type: 'meta',
-        name: 'fred',
-        states: {
-          pkg1: 'enabled',
-          pkg2: 'disabled'
-        },
-        deserializer: 'PkgGroupsMeta'
-      })
-
-      expect(fred.name).toBe('fred')
-      expect(fred.has('pkg1')).toBe(true)
-      expect(fred.has('pkg2')).toBe(true)
-      expect(fred.stateOf('pkg1')).toEqual('enabled')
-      expect(fred.stateOf('pkg2')).toEqual('disabled')
-    })
-
-    it('can construct from JSON', () => {
-      let fred = new PkgGroupsMeta(`{"type":"meta",
-        "name":"fred",
-        "states":{"pkg1": "enabled", "pkg2": "disabled"},
-        "deserializer":"PkgGroupsMeta"}`)
-
-      expect(fred.name).toBe('fred')
-      expect(fred.has('pkg1')).toBe(true)
-      expect(fred.has('pkg2')).toBe(true)
-      expect(fred.stateOf('pkg1')).toEqual('enabled')
-      expect(fred.stateOf('pkg2')).toEqual('disabled')
-    })
-
-    it('requires a name', () => {
-      let callNoParam = function () {
-        let _ = new PkgGroupsMeta()/* eslint no-unused-vars: 0 */
-      }
-      expect(callNoParam).toThrow(new Error('PkgGroupsMeta must have a name'))
-    })
-
-    it('requires a stateMap', () => {
-      let callNameOnly = function () {
-        let _ = new PkgGroupsMeta('aname')
-      }
-      expect(callNameOnly).toThrow(new SyntaxError('Unexpected token a in JSON at position 0'))
-    })
-  })
-
-  it('can serialize', () => {
-    let fred = new PkgGroupsMeta({
-      'name': 'fred',
-      'type': 'meta',
-      'states': {
-        'pkg1': 'enabled',
-        'pkg2': 'disabled'
-      }
-    })
-    let data = fred.serialize()
-    expect(data['name']).toEqual('fred')
-    expect(data['type']).toEqual('meta')
-    expect(data['states']).toBeInstanceOf(Object)
-    expect(data['states']['pkg1']).toEqual('enabled')
-    expect(data['states']['pkg2']).toEqual('disabled')
-  })
-})
+const logger = log4js.getLogger('pkg-groups-spec')
+logger.level = 'debug'
 
 describe('PkgGroupsModel', () => {
   let model  /* PkgGroupsModel */
   let model2
+  let model3
 
   beforeEach(() => {
     model = new PkgGroupsModel({
@@ -151,11 +46,11 @@ describe('PkgGroupsModel', () => {
         {
           type: 'group',
           name: 'group1',
-          packages: ['fred', 'sally', 'barney']
+          packages: ['language-php', 'language-python', 'language-ruby']
         }, {
           type: 'group',
           name: 'group2',
-          packages: ['frank', 'tom', 'dick', 'harry']
+          packages: ['whitespace', 'timecop', 'dick', 'harry']
         }, {
           type: 'group',
           name: 'group3',
@@ -188,6 +83,31 @@ describe('PkgGroupsModel', () => {
       enabled: [
         'meta1', 'meta2'
       ],
+      disabled: ['group2']
+    })
+    model3 = new PkgGroupsModel({
+      groups: [
+        {
+          type: 'group',
+          name: 'group1',
+          packages: ['fred', 'sally', 'barney']
+        }, {
+          type: 'group',
+          name: 'group2',
+          packages: ['frank', 'tom', 'dick', 'harry']
+        }
+      ],
+      metas: [
+        {
+          type: 'meta',
+          name: 'meta1',
+          states: {
+            group1: 'enabled',
+            group2: 'enabled'
+          }
+        }
+      ],
+      enabled: ['meta1'],
       disabled: ['group2']
     })
     // waitsForPromise(atom.packages.loadPackages())
@@ -247,7 +167,10 @@ describe('PkgGroupsModel', () => {
   describe('serialize()', () => {
     it('returns a JS object', () => {
       const obj = model.serialize()
-      for (const propName of ['groups', 'metas', 'enabled', 'disabled']) {
+      for (const propName of ['groups',
+        'metas',
+        'enabled',
+        'disabled']) {
         expect(obj.hasOwnProperty(propName)).toBe(true)
         expect(obj[propName]).toBeInstanceOf(Array)
       }
@@ -364,18 +287,67 @@ describe('PkgGroupsModel', () => {
   describe('packageStates()', () => {
     it('handles the basic case', () => {
       const map = model.packageStates
-      expect(map.toJS()).toEqual({group2: 'disabled', group1: 'enabled'})
+      expect(map.toJS()).toEqual({
+        fred: 'enabled',
+        sally: 'enabled',
+        barney: 'enabled',
+        frank: 'disabled',
+        tom: 'disabled',
+        dick: 'disabled',
+        harry: 'disabled'
+      })
     })
     it('can handle meta-groups in meta-groups', () => {
       const map = model2.packageStates
-      expect(map.toJS()).toEqual({group1: 'enabled', group2: 'disabled', group3: 'enabled', group4: 'disabled'})
+      expect(map.toJS()).toEqual({
+        'language-php': 'enabled',
+        'language-python': 'enabled',
+        'language-ruby': 'enabled',
+        whitespace: 'disabled',
+        timecop: 'disabled',
+        dick: 'disabled',
+        harry: 'disabled',
+        a: 'enabled',
+        b: 'enabled',
+        c: 'enabled',
+        d: 'enabled',
+        alpha: 'enabled',
+        beta: 'enabled',
+        gamma: 'enabled',
+        epsilon: 'enabled'
+      })
     })
     // TODO: test specific scenarios
   })
 
   describe('differences()', () => {
     it('returns a map of package names => states', () => {
-      const diffs = model.differences
+      let diffs = model3.differences(true)
+      expect(diffs.get('enabled').toJS()).toEqual([])
+      expect(diffs.get('disabled').size).toEqual(0)
+      expect(diffs.get('missing')).toEqual(
+        new Immutable.Set(['fred', 'sally', 'barney', 'frank', 'tom', 'dick', 'harry']))
+
+      let allPkgNames = atom.packages.getAvailablePackageNames()
+      allPkgNames = allPkgNames.filter((x) => atom.packages.isBundledPackage(x))
+      model3.groups = model3.groups.merge({
+        bundled: new PkgGroupsGroup('bundled', allPkgNames)
+      })
+      model3.enabled = new Immutable.Set(['bundled'])
+      diffs = model3.differences(true)
+      expect(diffs).toBeInstanceOf(Immutable.Map)
+      expect(diffs.get('disabled').size).toEqual(0)
+      expect(diffs.get('enabled').size).toBeGreaterThan(80)
+      expect(diffs.get('missing')).toEqual(new Immutable.Set(['harry', 'dick', 'tom', 'frank']))
+      logger.debug(diffs)
+      /**
+       * Real problem here. when run under test, all the non-bundled packages are
+       * 'available' but not 'loaded' or 'enabled'. Will need to
+       * 1. load and enable specific packages for testing (but user may not have *any* installed)
+       * 2. Create some mock packages.
+       * Will try '1' first as 'the simplest thing that will possibly work', then build on that
+       * to implement '2'
+       */
     })
   })
 })
