@@ -11,6 +11,12 @@
   "plugins": {
     "doc_comment": true,
     "node": true,
-    "es_modules": {}
+    "es_modules": {},
+    "modules": {
+      "dontLoad": "",
+      "load": "",
+      "modules": ""
+    },
+    "node_resolve": {}
   }
 }
