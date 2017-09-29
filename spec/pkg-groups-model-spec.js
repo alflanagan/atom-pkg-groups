@@ -6,14 +6,53 @@ import Immutable from 'immutable'
 import PkgGroupsModel from '../lib/pkg-groups-model'
 import PkgGroupsGroup from '../lib/pkg-groups-group'
 import PkgGroupsMeta from '../lib/pkg-groups-meta'
+import MockPackageManager from './atom-packages-mock'
 
 const logger = log4js.getLogger('pkg-groups-model-spec')
 logger.level = 'info'
 
 describe('PkgGroupsModel', () => {
-  let model  /* PkgGroupsModel */
+  let model/* PkgGroupsModel */
   let model2
   let model3
+
+  const mockPkgManager = new MockPackageManager([
+    'ide-php',
+    'ide-typescript',
+    'image-view',
+    'incompatible-packages',
+    'intentions',
+    'jumpy',
+    'keybinding-resolver',
+    'language-babel',
+    'language-c',
+    'language-clojure',
+    'language-coffee-script',
+    'language-csharp',
+    'language-css',
+    'language-forth',
+    'language-generic-config',
+    'language-gfm',
+    'language-git',
+    'language-go',
+    'language-html',
+    'language-hyperlink',
+    'language-ini',
+    'language-java'
+  ], [
+    'keybinding-resolver',
+    'language-c',
+    'language-clojure',
+    'language-coffee-script',
+    'language-css',
+    'language-gfm',
+    'language-html',
+    'language-hyperlink'
+  ], [
+    'image-view',
+    'incompatible-packages',
+    'intentions'
+  ])
 
   beforeEach(() => {
     model = new PkgGroupsModel({
@@ -90,11 +129,11 @@ describe('PkgGroupsModel', () => {
         {
           type: 'group',
           name: 'group1',
-          packages: ['fred', 'sally', 'barney']
+          packages: ['language-csharp', 'language-css', 'incompatible-packages']
         }, {
           type: 'group',
           name: 'group2',
-          packages: ['frank', 'tom', 'dick', 'harry']
+          packages: ['language-go', 'language-clojure', 'language-html', 'language-spanish']
         }
       ],
       metas: [
@@ -110,8 +149,6 @@ describe('PkgGroupsModel', () => {
       enabled: ['meta1'],
       disabled: ['group2']
     })
-    // waitsForPromise(atom.packages.loadPackages())
-    // waitsForPromise(atom.packages.activatePackages())
   })
 
   describe('constructor()', () => {
@@ -322,38 +359,18 @@ describe('PkgGroupsModel', () => {
 
   describe('differences()', () => {
     it('returns three sets of packages names', () => {
-      let diffs = model3.differences(true)
-      expect(diffs.get('enabled').toJS()).toEqual([])
-      expect(diffs.get('disabled').size).toEqual(0)
-      expect(
-        diffs.get('missing').equals(
-          new Immutable.Set(['fred', 'sally', 'barney', 'frank', 'tom', 'dick', 'harry']))
-      ).toBe(true)
-
-      let allPkgNames = atom.packages.getAvailablePackageNames()
-      allPkgNames = allPkgNames.filter((x) => atom.packages.isBundledPackage(x))
-      model3.groups = model3.groups.merge({
-        bundled: new PkgGroupsGroup('bundled', allPkgNames)
-      })
-      model3.enabled = new Immutable.Set(['bundled'])
-      expect(model3.groups.has('bundled')).toBe(true)
-      expect(model3.enabled.toJS()).toEqual(['bundled'])
-      diffs = model3.differences(true)
-      expect(diffs).toBeInstanceOf(Immutable.Map)
-      expect(diffs.get('disabled').size).toEqual(0)
-      expect(diffs.get('enabled').size).toBeGreaterThan(80)
-      expect(
-        diffs.get('missing').equals(
-          new Immutable.Set(['harry', 'dick', 'tom', 'frank']))).toBe(true)
-      logger.debug(diffs)
-      /**
-       * Real problem here. when run under test, all the non-bundled packages are
-       * 'available' but not 'loaded' or 'enabled'. Will need to
-       * 1. load and enable specific packages for testing (but user may not have *any* installed)
-       * 2. Create some mock packages.
-       * Will try '1' first as 'the simplest thing that will possibly work', then build on that
-       * to implement '2'
-       */
+      const realPkgMgr = atom.packages
+      atom.packages = mockPkgManager
+      try {
+        let diffs = model3.differences(true)
+        expect(diffs).toBeInstanceOf(Immutable.Map)
+        expect(diffs.get('enabled').toJS()).toEqual(['language-go', 'language-clojure', 'language-html'])
+        expect(diffs.get('disabled').toJS()).toEqual(['incompatible-packages'])
+        expect(diffs.get('missing').toJS()).toEqual(['language-spanish'])
+      } finally {
+        // this might be important ;)
+        atom.packages = realPkgMgr
+      }
     })
   })
 })
