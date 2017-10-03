@@ -3,7 +3,6 @@
 
 /* eslint-env jasmine */
 
-import etch from 'etch'
 import log4js from 'log4js'
 import Immutable from 'immutable'
 
@@ -21,7 +20,12 @@ describe('PkgSelectList', () => {
       expect(ppl.id).toBeUndefined()
     })
     it('correctly sets lists', () => {
-      const ppl = new PkgPickList({rightList: ['a', 'b', 'c'], leftList: ['1', '2', '3']})
+      const ppl = new PkgPickList({
+        rightList: [
+          'a', 'b', 'c'
+        ],
+        leftList: ['1', '2', '3']
+      })
       expect(ppl.right).toEqual(new Immutable.Set(['a', 'b', 'c']))
     })
   })

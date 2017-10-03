@@ -21,10 +21,7 @@ describe('PkgSelectList', () => {
     })
     it('sets properties', () => {
       const items = ['a', 'b', 'c']
-      const psl = new PkgSelectList({
-        items: items,
-        'default': 'b'
-      })
+      const psl = new PkgSelectList({items: items, 'default': 'b'})
       expect(psl.items).toEqual(items)
       expect(psl.default).toEqual('b')
     })
@@ -57,10 +54,7 @@ describe('PkgSelectList', () => {
   describe('a component may have a default selection', () => {
     it('renders as a list', () => {
       const items = ['a', 'b', 'c']
-      const dom = new PkgSelectList({
-        items: items,
-        'default': 'b'
-      }).render()
+      const dom = new PkgSelectList({items: items, 'default': 'b'}).render()
       expect(dom).toEqual((
         <div className={PkgSelectList.classTag}>
           <ul>
@@ -75,11 +69,10 @@ describe('PkgSelectList', () => {
   describe('a component may be updated', () => {
     it('renders using new properties', () => {
       const items = ['a', 'b', 'c']
-      const psl = new PkgSelectList({items: ['1', '2', '3']})
-      psl.update({
-        items: items,
-        'default': 'b'
+      const psl = new PkgSelectList({
+        items: ['1', '2', '3']
       })
+      psl.update({items: items, 'default': 'b'})
       const dom = psl.render()
       expect(dom).toEqual((
         <div className={PkgSelectList.classTag}>
