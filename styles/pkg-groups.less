@@ -10,6 +10,50 @@
 @list_selected_clr: white;
 
 .pkg-groups {
+  .package-list {
+    min-height: 500px;
+    background-color: lightgrey;
+    & ul {
+      list-style: none;
+    }
+  }
+
+  .installed-packages {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 500px;
+    //temporary: got to be better way to fit this to users screen
+  }
+
+  .pick-list-left-list {
+    width: 40%;
+    float: left;
+  }
+
+  .pick-list-right-list {
+    width: 40%;
+    float: right;
+  }
+
+  .pick-list-button-col {
+    width: 15%;
+    float: left;
+    margin-left: 15px;
+    button:nth-child(1) {
+      margin-top: 100px;
+    }
+    button {
+      margin-left: 15px;
+      margin-top: 30px;
+    }
+  }
+
+  .select-list {
+    height: 100px;
+    background-color: lightgrey;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
   // h1 {
   //   margin-left: @left_gutter;
   // }
