@@ -93,5 +93,30 @@ describe('PkgSelectList', () => {
       </div>
     )
   })
-  describe('move', () => {})
+
+  describe('move', () => {
+    it('can move an item from left to right, and re-render.', () => {
+      const pick = new PkgPickList({
+        rightList: [
+          'pkg1', 'pkg2', 'pkg3'
+        ],
+        leftList: ['pkg4', 'pkg5']
+      })
+      pick.move('right', 'pkg5').then(() => {
+        expect(pick.leftList.toJS()).toEqual(['pkg4'])
+        expect(pick.rightList.toJS()).toEqual(['pkg1', 'pkg2', 'pkg3', 'pkg5'])
+        let dom = pick.render()
+        expect(dom).toEqual(
+          <div className='package-pick-list'>
+            <PkgListComponent className='pick-list-left-list' items={new Immutable.Set(['pkg4'])} />
+            <div className='pick-list-button-col'>
+              <button className='pick-list-btn-move-right'>&lt;&lt;</button>
+              <button className='pick-list-btn-move-left'>&gt;&gt;</button>
+            </div>
+            <PkgListComponent className='pick-list-right-list' items={new Immutable.Set(['pkg1', 'pkg2', 'pkg3', 'pkg5'])} />
+          </div>
+        )
+      })
+    })
+  })
 })
