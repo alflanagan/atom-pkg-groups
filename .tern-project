@@ -3,10 +3,11 @@
   "libs": [],
   "loadEagerly": [
     "lib/*",
-    "spec/*"
+    "spec/*",
+    "../atom/vendor/*",
+    "../atom/src/*"
   ],
   "dontLoad": [
-    "node_modules/**"
   ],
   "plugins": {
     "doc_comment": true,
