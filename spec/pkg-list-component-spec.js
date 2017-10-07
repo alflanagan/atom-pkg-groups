@@ -8,7 +8,7 @@ import log4js from 'log4js'
 
 import PkgListComponent from '../lib/pkg-list-component'
 
-const logger = log4js.getLogger('pkg-groups-spec')
+const logger = log4js.getLogger('pkg-groups-list-component-spec')
 logger.level = 'debug'
 
 describe('PkgListComponent', () => {
@@ -20,6 +20,7 @@ describe('PkgListComponent', () => {
       <div className='package-list'><ul /></div>
     )
   })
+
   it('lists packages in its properties', () => {
     const fred = new PkgListComponent({
       packages: ['barney', 'betty', 'bam-bam']
@@ -36,6 +37,7 @@ describe('PkgListComponent', () => {
       </div>
     )
   })
+
   it('passes through className property', () => {
     let bub = new PkgListComponent({
       className: 'CSC266',
@@ -53,6 +55,7 @@ describe('PkgListComponent', () => {
       </div>
     )
   })
+
   it('passes through other properties', () => {
     let bub = new PkgListComponent({
       className: 'CSC266',
@@ -73,5 +76,53 @@ describe('PkgListComponent', () => {
         </ul>
       </div>
     )
+  })
+
+  describe('update', () => {
+    it('updates existing properties correctly', () => {
+      const bub = new PkgListComponent({
+        className: 'CSC266',
+        packages: [
+          'pkg1', 'pkg2', 'pkg3'
+        ],
+        id: 'my-pkg-list',
+        frobozz: 'gulash'
+      })
+      expect(bub.count).toBe(3)
+      bub.update({
+        className: 'freddie',
+        packages: [
+          'pkg5', 'pkg6', 'pkg7'
+        ],
+        id: 'my-updated-list',
+        frobozz: 'kumquat'
+      })
+      expect(bub.packages).toEqual(['pkg5', 'pkg6', 'pkg7'])
+      expect(bub.props.id).toEqual('my-updated-list')
+      expect(bub.props.frobozz).toEqual('kumquat')
+      expect(bub.props.className).toEqual('freddie package-list')
+    })
+
+    it('handles new or missing properties', () => {
+      const bub = new PkgListComponent({
+        className: 'CSC266',
+        packages: [
+          'pkg1', 'pkg2', 'pkg3'
+        ],
+        id: 'my-pkg-list',
+        frobozz: 'gulash'
+      })
+      expect(bub.count).toBe(3)
+      bub.update({
+        className: 'freddie',
+        id: 'my-updated-list',
+        fimbul: 'kumquat'
+      })
+      expect(bub.packages).toEqual([])
+      expect(bub.props.id).toEqual('my-updated-list')
+      expect(bub.props.className).toEqual('freddie package-list')
+      expect(bub.props.fimbul).toEqual('kumquat')
+      expect(bub.props.frobozz).not.toExist()
+    })
   })
 })
