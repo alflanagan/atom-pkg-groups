@@ -1,8 +1,6 @@
 /** @babel */
 /* eslint-env jasmine */
 
-import etch from 'etch'
-
 import PkgGroupsView from '../lib/pkg-groups-view'
 
 describe('PkgGroupsView', () => {
