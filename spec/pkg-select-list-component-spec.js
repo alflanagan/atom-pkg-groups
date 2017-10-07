@@ -5,10 +5,11 @@
 
 import etch from 'etch'
 import log4js from 'log4js'
+import path from 'path'
 
 import PkgSelectList from '../lib/pkg-select-list-component'
 
-const logger = log4js.getLogger('pkg-select-list-component-spec')
+const logger = log4js.getLogger(path.basename(__filename, '.js'))
 logger.level = 'debug'
 
 describe('PkgSelectList', () => {
@@ -17,7 +18,7 @@ describe('PkgSelectList', () => {
     it('reuires no arguments', () => {
       expect(sl).toBeInstanceOf(PkgSelectList)
       expect(sl.items).toEqual([])
-      expect(sl.default).toBeUndefined()
+      expect(sl.default).toBeNull()
     })
     it('sets properties', () => {
       const items = ['a', 'b', 'c']
@@ -26,6 +27,7 @@ describe('PkgSelectList', () => {
       expect(psl.default).toEqual('b')
     })
   })
+
   describe('a component with no props', () => {
     it('renders an empty list', () => {
       const dom = new PkgSelectList().render()
@@ -36,6 +38,7 @@ describe('PkgSelectList', () => {
       )
     })
   })
+
   describe('A component may have items', () => {
     it('renders as a list', () => {
       const items = ['a', 'b', 'c']
@@ -51,6 +54,7 @@ describe('PkgSelectList', () => {
       ))
     })
   })
+
   describe('a component may have a default selection', () => {
     it('renders as a list', () => {
       const items = ['a', 'b', 'c']
@@ -66,6 +70,7 @@ describe('PkgSelectList', () => {
       ))
     })
   })
+
   describe('a component may be updated', () => {
     it('renders using new properties', () => {
       const items = ['a', 'b', 'c']
