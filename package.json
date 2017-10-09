@@ -2,7 +2,7 @@
   "name": "pkg-groups",
   "main": "./lib/pkg-groups",
   "version": "0.0.2",
-  "description": "Easily enable/disable packages in groups.",
+  "description": "Define groups of packages, and enable/disable them.",
   "keywords": [
     "package",
     "configuration"
@@ -21,15 +21,19 @@
     "log4js": "^2.3.3"
   },
   "deserializers": {
-    "PkgGroupsView": "deserializePkgGroupsView"
+    "PkgGroupsView": "deserializePkgGroupsView",
+    "PkgGroupsModel": "deserializePkgGroupsModel"
   },
   "devDependencies": {
+    "babel-eslint": "^8.0.1",
     "standard": "*"
   },
   "scripts": {
-    "test": "standard && apm test"
+    "test": "standard && apm test",
+    "make-tar": "rm -f pkg-groups.tar; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -type f -print)"
   },
   "standard": {
+    "parser": "babel-eslint",
     "globals": [
       "atom"
     ]
