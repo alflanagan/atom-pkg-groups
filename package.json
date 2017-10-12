@@ -18,11 +18,11 @@
   "dependencies": {
     "etch": "^0.12.6",
     "immutable": "^3.8.1",
-    "log4js": "^2.3.3"
+    "log4js": "^2.3.5"
   },
   "deserializers": {
-    "PkgGroupsView": "deserializePkgGroupsView",
-    "PkgGroupsModel": "deserializePkgGroupsModel"
+    "pkg-groups/PkgGroupsView": "deserializePkgGroupsView",
+    "pkg-groups/PkgGroupsModel": "deserializePkgGroupsModel"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.1",
@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "standard && apm test",
-    "make-tar": "rm -f pkg-groups.tar; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -type f -print)",
+    "make-tar": "rm -f pkg-groups.tar; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -type f -print)",
     "make-docs": "rm -rf docs/*; esdoc"
   },
   "standard": {
