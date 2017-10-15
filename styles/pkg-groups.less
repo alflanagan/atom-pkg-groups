@@ -3,16 +3,27 @@
 // See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
 // for a full listing of what's available.
 @import "ui-variables";
-
 @left_gutter: 3em;
 @list_item_bgd: lightsteelblue;
 @list_selected_bgd: darkblue;
 @list_selected_clr: white;
 
 .pkg-groups {
-  .package-list {
+  .select-list {
+    height: 100px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    & ul {
+      list-style-type: none;
+      font-size: 14px;
+    }
+  }
+
+  #pkg-groups-group-pick .pkg-select-list {
     min-height: 500px;
     background-color: lightgrey;
+
     & ul {
       list-style: none;
     }
@@ -39,47 +50,19 @@
     width: 15%;
     float: left;
     margin-left: 15px;
+
     button:nth-child(1) {
       margin-top: 100px;
     }
+
     button {
       margin-left: 15px;
       margin-top: 30px;
     }
   }
 
-  .select-list {
-    height: 100px;
-    background-color: lightgrey;
-    overflow-x: hidden;
-    overflow-y: scroll;
-  }
-  // h1 {
-  //   margin-left: @left_gutter;
-  // }
   h2 {
     margin-top: -.4em;
     font-weight: 600;
   }
-  // #groups-name-list {
-  //   li {
-  //     width: 10em;
-  //     list-style: none;
-  //     margin-bottom: .2em;
-  //     background-color: @list_item_bgd;
-  //     text-align: center;
-  //     font-size: 1.2em;
-  //   }
-  //   li:hover {
-  //     color: @list_selected_clr;
-  //     background-color: @list_selected_bgd;
-  //     font-weight: 700;
-  //   }
-  // }
-  // #add-group-div {
-  //   width: 10em;
-  //   button {
-  //     margin: auto;
-  //   }
-  // }
 }
