@@ -8,7 +8,7 @@ describe('PkgGroupsView', () => {
     it('does not require arguments', () => {
       let fred = new PkgGroupsView()
       expect(fred.children).not.toExist()
-      expect(fred.props).toEqual({})
+      expect(fred.props).toEqual({packages: []})
       // attributes added to component by etch.initialize()
       expect(fred.virtualNode['tag']).toEqual('div')
       expect(fred.virtualNode['props']['className']).toEqual('pkg-groups')
