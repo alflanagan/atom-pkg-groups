@@ -11,7 +11,6 @@ import path from 'path'
 import PkgSelectList from '../lib/pkg-select-list-component'
 import DomDiff from '../lib/pkg-groups-dom-diff' // eslint-disable-line no-unused-vars
 import {promiseAnEvent} from '../lib/pkg-groups-functions'
-import {PkgSelectListChangeEvent} from '../lib/pkg-groups-events'
 
 const logger = log4js.getLogger(path.basename(__filename, '.js'))
 logger.level = 'warn'
@@ -36,21 +35,20 @@ describe('PkgSelectList', () => {
 
   describe('a component renders', () => {
     it('renders an empty list', () => {
-      const dom = new PkgSelectList().render()
-      /* this is kind of cheating, but was easiest thing that worked */
-      const cback = dom.children[0].props['onclick']
+      const psl = new PkgSelectList()
+      const dom = psl.render()
       const expected = <div className={PkgSelectList.classTag}>
-        <ul onclick={cback} />
+        <ul on={{click: psl.didClick}} />
       </div>
       expect(dom).toEqual(expected)
     })
 
     it('renders as a list', () => {
       const items = ['a', 'b', 'c']
-      const dom = new PkgSelectList({items}).render()
-      const cback = dom.children[0].props['onclick']
+      const psl = new PkgSelectList({items})
+      const dom = psl.render()
       const expected = <div className={PkgSelectList.classTag}>
-        <ul onclick={cback}>
+        <ul on={{click: psl.didClick}}>
           <li value='0'>a</li>
           <li value='1'>b</li>
           <li value='2'>c</li>
@@ -65,10 +63,10 @@ describe('PkgSelectList', () => {
 
     it('renders as a list with a selected item', () => {
       const items = ['a', 'b', 'c']
-      const dom = new PkgSelectList({items: items, 'default': 'b'}).render()
-      const cback = dom.children[0].props['onclick']
+      const psl = new PkgSelectList({items: items, 'default': 'b'})
+      const dom = psl.render()
       const expected = <div className={PkgSelectList.classTag}>
-        <ul onclick={cback}>
+        <ul on={{click: psl.didClick}}>
           <li value='0'>a</li>
           <li className='selected' value='1'>b</li>
           <li value='2'>c</li>
@@ -82,7 +80,7 @@ describe('PkgSelectList', () => {
       const psl = new PkgSelectList({items: items, 'default': 'b', className: 'fred wilma'})
       const dom = psl.render()
       const expected = <div className={`fred wilma ${PkgSelectList.classTag}`}>
-        <ul onclick={psl.handleClick}>
+        <ul on={{click: psl.didClick}}>
           <li value='0'>a</li>
           <li className='selected' value='1'>b</li>
           <li value='2'>c</li>
@@ -100,9 +98,8 @@ describe('PkgSelectList', () => {
       })
       psl.update({items: items, 'default': 'b'})
       const dom = psl.render()
-      const cback = dom.children[0].props['onclick']
       const expected = <div className={PkgSelectList.classTag}>
-        <ul onclick={cback}>
+        <ul on={{click: psl.didClick}}>
           <li value='0'>a</li>
           <li className='selected' value='1'>b</li>
           <li value='2'>c</li>
@@ -114,8 +111,7 @@ describe('PkgSelectList', () => {
 
   describe('event handling', () => {
     describe('a select list changes selected item on mouse click', () => {
-      it('generates a PkgSelectListChangeEvent', async() => {
-        logger.debug('test PkgSelectListChangeEvent')
+      it('generates a change event', async() => {
         const items = ['a', 'b', 'c']
         const psl = new PkgSelectList({items: items, 'default': 'a', id: 'some-psl'})
         expect(psl.element).toBeInstanceOf(HTMLDivElement)
@@ -126,12 +122,12 @@ describe('PkgSelectList', () => {
         expect(itemb.getAttribute('value')).toEqual('1')
         expect(itemb.tagName).toEqual('LI')
         /* this is undoubtedly more complex than it needs to be. but it works */
-        let prom = promiseAnEvent(psl.onChange, () => itemb.click()).then((evt) => {
-          expect(evt).toBeInstanceOf(PkgSelectListChangeEvent)
-          logger.debug('change event complete')
+        let prom = promiseAnEvent(psl.onChange, () => itemb.click()).then((selected) => {
+          expect(selected).toEqual('b')
           const dom = psl.render()
-          const expected = <div className='pkg-select-list'>
-            <ul onclick={psl.handleClick}>
+          const anonOnClick = dom.children[0].props['on']['click']
+          const expected = <div className='pkg-select-list' id='some-psl'>
+            <ul on={{'click': anonOnClick}}>
               <li value='0'>a</li>
               <li value='1' className='selected'>b</li>
               <li value='2'>c</li>
@@ -141,6 +137,40 @@ describe('PkgSelectList', () => {
           // expect(psl.props.default).toEqual('b')
         })
         waitsForPromise(() => prom)
+      })
+
+      it('correctly sets up event handler from JSX representation', () => {
+        const newElement = document.createElement('div')
+        // TODO: use jasmine spy instead
+        let wasCalled = false
+        const didClick = (evt) => {
+          wasCalled = true
+        }
+        const psl = <PkgSelectList id='pkg-select-list-tester'
+          items={['item1', 'item2', 'item3']}
+          on={{click: didClick}} />
+
+        newElement.appendChild(etch.render(psl))
+        let item2 = newElement.children[0].children[0].children[1]
+        item2.click()
+        expect(wasCalled).toBe(true)
+        /* now we re-render the element */
+        newElement.removeChild(newElement.children[0])
+        newElement.appendChild(etch.render(psl))
+        /* and get the new item2 */
+        item2 = newElement.children[0].children[0].children[1]
+
+        let hasClass = false
+        for (let attr of item2.attributes) {
+          if (attr.name === 'value') {
+            expect(attr.value).toEqual('1')
+          }
+          if (attr.name === 'class') {
+            hasClass = true
+            expect(attr.value).toEqual('selected')
+          }
+          expect(hasClass).toBe(true)
+        }
       })
     })
   })
