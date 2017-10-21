@@ -34,4 +34,11 @@ describe('addIfMissing', () => {
     testStr = addIfMissing('', '', '')
     expect(testStr).toEqual('')
   })
+
+  it('returns only 2nd argument if first is not a string', () => {
+    let testStr = addIfMissing(undefined, 'land of confusion', 'this is the ')
+    expect(testStr).toEqual('land of confusion')
+    testStr = addIfMissing({ completely: 'wrong' }, 'blah blah blah', '')
+    expect(testStr).toEqual('blah blah blah')
+  })
 })
