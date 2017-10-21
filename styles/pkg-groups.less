@@ -17,6 +17,21 @@
     & ul {
       list-style-type: none;
       font-size: 14px;
+      padding-right: 40px;
+      & li {
+        cursor: pointer;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-bottom-color: lightgrey;
+      }
+      & li:first-child {
+        border-top-style: solid;
+        border-top-color: lightgray;
+        border-top-width: 1px;
+      }
+      & li.selected {
+        background-color: lightyellow;
+      }
     }
   }
 
@@ -39,11 +54,29 @@
   .pick-list-left-list {
     width: 40%;
     float: left;
+    & ul {
+      font-size: 15px;
+      & li {
+        cursor: pointer;
+      }
+      & li.selected {
+        color: darkred;
+      }
+    }
   }
 
   .pick-list-right-list {
     width: 40%;
     float: right;
+    & ul {
+      font-size: 15px;
+      & li {
+        cursor: pointer;
+      }
+      & li.selected {
+        color: darkred;
+      }
+    }
   }
 
   .pick-list-button-col {
