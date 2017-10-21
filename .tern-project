@@ -1,11 +1,10 @@
 {
   "ecmaVersion": "7",
-  "libs": [],
+  "libs": [ "browser",
+  "ecmascript" ],
   "loadEagerly": [
     "lib/*",
-    "spec/*",
-    "../atom/vendor/*",
-    "../atom/src/*"
+    "spec/*"
   ],
   "dontLoad": [
   ],
