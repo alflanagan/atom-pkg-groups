@@ -1,7 +1,7 @@
 {
   "name": "pkg-groups",
   "main": "./lib/pkg-groups",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Define groups of packages, and enable/disable them.",
   "keywords": [
     "package",
@@ -16,30 +16,51 @@
     "atom": ">=1.19.0 <2.0.0"
   },
   "dependencies": {
-    "etch": "^0.12.6",
-    "immutable": "^3.8.1",
-    "log4js": "^2.3.5"
+    "etch": "~0.12.6",
+    "immutable": "~3.8.1",
+    "log4js": "^2.3.7"
   },
   "deserializers": {
     "pkg-groups/PkgGroupsView": "deserializePkgGroupsView",
     "pkg-groups/PkgGroupsModel": "deserializePkgGroupsModel"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "esdoc": "^1.0.3",
     "esdoc-jsx-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
     "standard": "*"
   },
   "scripts": {
-    "test": "standard && apm test",
-    "make-tar": "rm -f pkg-groups.tar; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -type f -print)",
+    "test": "standard;  apm-beta test -p /usr/bin/atom-beta",
+    "make-tar": "rm -f pkg-groups.tar pkg-groups.tar.gz; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -type f -print); gzip pkg-groups.tar",
     "make-docs": "rm -rf docs/*; esdoc"
   },
   "standard": {
     "parser": "babel-eslint",
+    "env": {
+      "jasmine": true,
+      "browser": true
+    },
     "globals": [
-      "atom"
+      "atom",
+      "waitForPromise"
+    ],
+    "rules": {
+      "no-global-assign": "error"
+    }
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ],
+    "plugins": [
+      "transform-class-properties",
+      "transform-react-jsx"
     ]
   }
 }
