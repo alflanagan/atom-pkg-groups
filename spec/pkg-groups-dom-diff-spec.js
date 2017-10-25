@@ -45,12 +45,18 @@ describe('DomDiff', () => {
 
     it('recursively finds differences between child nodes', () => {
       const diff = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li property='checked'>fred</li><li>thomas</li></ul>)
-      /* found 1 child which is different... */
-      expect(Object.keys(diff.children).length).toEqual(1)
-      /* because it has 1 child which is different */
-      for (let key in diff.children) {
-        expect(Object.keys(diff.children[key].children).length).toEqual(1)
-      }
+      expect(Object.keys(diff.children).length).toEqual(2)
+      expect(diff.children[0].in2Only).toEqual(['property'])
+      expect(diff.children[1].children[0].texts).toEqual(['barney', 'thomas'])
+    })
+
+    it('handles missing properties OK', () => {
+      const actual = <div className='someclass'><ol className='someotherclass'><li>fred</li></ol></div>
+      const expected = <div className='pkg-select-list'><ol /></div>
+      const diff = new DomDiff(actual, expected)
+      expect(diff.children[0].in1Only).toEqual(['className'])
+      const diff2 = new DomDiff(expected, actual)
+      expect(diff2.children[0].in2Only).toEqual(['className'])
     })
   })
 
@@ -106,8 +112,10 @@ describe('DomDiff', () => {
     })
 
     it('recursively reports differences between child nodes', () => {
-      const diff = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li property='notchecked'>fred</li><li>thomas</li></ul>)
+      const diff = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li>fred</li><li>thomas</li></ul>)
       expect(diff.toString()).toEqual('The DOMs have differing children at index 1. Differences:\n\tThe DOMs have differing children at index 0. Differences:\n\t\tFirst DOM has text barney, but second has thomas.')
+      const diff2 = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li className='betty'>fred</li><li>barney</li></ul>)
+      expect(diff2.toString()).toEqual('The DOMs have differing children at index 0. Differences:\n\tProperties found in 2nd DOM but not the first: className')
     })
   })
 })
