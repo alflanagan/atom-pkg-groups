@@ -2,7 +2,7 @@
 /** @jsx etch.dom */
 
 /* eslint-env jasmine */
-import {addIfMissing} from '../lib/pkg-groups-functions'
+import {addIfMissing, firstTrue} from '../lib/pkg-groups-functions'
 import log4js from 'log4js'
 
 const logger = log4js.getLogger('pkg-groups-functions-spec')
@@ -40,5 +40,27 @@ describe('addIfMissing', () => {
     expect(testStr).toEqual('land of confusion')
     testStr = addIfMissing({ completely: 'wrong' }, 'blah blah blah', '')
     expect(testStr).toEqual('blah blah blah')
+  })
+})
+
+describe('firstTrue', () => {
+  it('calls 1st function if 1st arg is true', () => {
+    const fred = firstTrue(true, () => 'hello')
+    expect(fred).toEqual('hello')
+  })
+
+  it('calls else function if 1st arg is false', () => {
+    const fred = firstTrue(false, () => 'hello', () => 'goodbye')
+    expect(fred).toEqual('goodbye')
+  })
+
+  it('handles multiple conditionals', () => {
+    const fred = firstTrue(1 === 2, () => 'one', 3 === 4, () => 'two', 2 + 3 === 5, () => 'three', 7 === 8, () => 'four')
+    expect(fred).toEqual('three')
+  })
+
+  it('throw error if all cases are false (and no default)', () => {
+    const badCall = () => firstTrue(false, () => 'bad', false, () => 'call')
+    expect(badCall).toThrow('firstTrue: all conditions were false, and no else value was found')
   })
 })
