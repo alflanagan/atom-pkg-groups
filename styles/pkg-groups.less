@@ -8,90 +8,38 @@
 @list_selected_bgd: darkblue;
 @list_selected_clr: white;
 
-.pkg-groups {
+.pkg-groups atom-panel.modal {
   .select-list {
     height: 100px;
     overflow-x: hidden;
     overflow-y: scroll;
-
-    & ul {
-      list-style-type: none;
-      font-size: 14px;
-      padding-right: 40px;
-      & li {
-        cursor: pointer;
-        border-bottom-style: solid;
-        border-bottom-width: 1px;
-        border-bottom-color: lightgrey;
-      }
-      & li:first-child {
-        border-top-style: solid;
-        border-top-color: lightgray;
-        border-top-width: 1px;
-      }
-      & li.selected {
-        background-color: lightyellow;
-      }
+    ol.list-group li {
+      padding-top: 0;
+      padding-bottom: 0;
     }
   }
 
-  #pkg-groups-group-pick .pkg-select-list {
-    min-height: 500px;
-    background-color: lightgrey;
+  #pkg-groups-lower-panel {
+    min-height: 460px;
 
-    & ul {
-      list-style: none;
+    .pkg-select-list {
+      // background-color: @overlay-background-color;
+      min-height: 400px;
+
+      ol.list-group li {
+        padding-left: 10px;
+      }
     }
-  }
-
-  .installed-packages {
-    overflow-x: hidden;
-    overflow-y: scroll;
-    height: 500px;
-    //temporary: got to be better way to fit this to users screen
   }
 
   .pick-list-left-list {
-    width: 40%;
+    width: 45%;
     float: left;
-    & ul {
-      font-size: 15px;
-      & li {
-        cursor: pointer;
-      }
-      & li.selected {
-        color: darkred;
-      }
-    }
   }
 
   .pick-list-right-list {
-    width: 40%;
+    width: 45%;
     float: right;
-    & ul {
-      font-size: 15px;
-      & li {
-        cursor: pointer;
-      }
-      & li.selected {
-        color: darkred;
-      }
-    }
-  }
-
-  .pick-list-button-col {
-    width: 15%;
-    float: left;
-    margin-left: 15px;
-
-    button:nth-child(1) {
-      margin-top: 100px;
-    }
-
-    button {
-      margin-left: 15px;
-      margin-top: 30px;
-    }
   }
 
   h2 {
