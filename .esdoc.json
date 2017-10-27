@@ -9,14 +9,16 @@
         "accessor": {"access": ["public", "protected"], "autoPrivate": true},
         "typeInference": {"enable": true},
         "test": {
-          "source": "./spec/",
-          "interfaces": ["describe", "it"],
-          "includes": [".*-spec\\.js$"]
+          "source": "./spec/"
         }
       }
     },
     {
       "name": "esdoc-jsx-plugin"
+    },
+    {
+      "name": "esdoc-ecmascript-proposal-plugin",
+      "option": {"all": true}
     }
   ]
 }
