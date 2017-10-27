@@ -1,6 +1,11 @@
 /** @babel */
 /** @jsx etch.dom */
 
+/*
+ * note: env setting is read from package.json calling 'standard' from command
+ *   line, but not when atom-ide-ui does diagnostics. Bug?
+ */
+
 /* eslint-env jasmine */
 
 import etch from 'etch'
@@ -10,8 +15,6 @@ import Immutable from 'immutable'
 import DomDiff from '../lib/pkg-groups-dom-diff' // eslint-disable-line no-unused-vars
 import PkgPickList from '../lib/pkg-pick-list-component'
 import PkgSelectList from '../lib/pkg-select-list-component'
-import {promiseAnEvent} from '../lib/pkg-groups-functions'
-import {PickListChangeEvent} from '../lib/pkg-groups-events'
 
 const logger = log4js.getLogger('pkg-pick-list-component-spec')
 logger.level = 'warn'
@@ -25,15 +28,25 @@ describe('PkgPickList', () => {
       expect(ppl.id).toBeUndefined()
     })
 
-    it('correctly sets lists', () => {
+    it('correctly sets properties', () => {
       const ppl = new PkgPickList({
         rightList: [
           'a', 'b', 'c'
         ],
-        leftList: ['1', '2', '3']
+        leftList: ['1', '2', '3'],
+        id: 'test-pkg-pick-list',
+        rightSelected: 'b',
+        leftSelected: null,
+        leftLabel: 'left',
+        rightLabel: 'right'
       })
       expect(ppl.right).toEqual(new Immutable.Set(['a', 'b', 'c']))
       expect(ppl.left).toEqual(new Immutable.Set(['1', '2', '3']))
+      expect(ppl.props.id).toEqual('test-pkg-pick-list')
+      expect(ppl.props.rightSelected).toEqual('b')
+      expect(ppl.props.leftSelected).toBe(null)
+      expect(ppl.props.rightLabel).toEqual('right')
+      expect(ppl.props.leftLabel).toEqual('left')
     })
   })
 
@@ -41,13 +54,15 @@ describe('PkgPickList', () => {
     it('renders with empty lists', () => {
       const fred = new PkgPickList()
       const dom = fred.render()
-      const expected = <div className='package-pick-list'>
-        <PkgSelectList className='pick-list-left-list' on={{PkgSelectListChangeEvent: fred.handleLeftSelectListChange}} items={new Immutable.Set([])} />
-        <div className='pick-list-button-col'>
-          <button onclick={fred.handleLeftButton} className='pick-list-btn-move-right'>&lt;&lt;</button>
-          <button onclick={fred.handleRightButton} className='pick-list-btn-move-left'>&gt;&gt;</button>
+      const expected = <div id='' className='package-pick-list'>
+        <div className='pick-list-left-list'>
+          <p className='pick-list-header'>{''}</p>
+          <PkgSelectList didChangeSelection={fred.didClickLeftItem} items={[]} emptyMessage={'no packages found'} />
         </div>
-        <PkgSelectList className='pick-list-right-list' on={{PkgSelectListChangeEvent: fred.handleRightSelectListChange}} items={new Immutable.Set([])} />
+        <div className='pick-list-right-list'>
+          <p className='pick-list-header'>{''}</p>
+          <PkgSelectList didChangeSelection={fred.didClickRightItem} items={[]} emptyMessage={'no packages selected'} />
+        </div>
       </div>
       const diff = new DomDiff(dom, expected)
       logger.debug(diff.toString())
@@ -59,19 +74,25 @@ describe('PkgPickList', () => {
         rightList: [
           'pkg1', 'pkg2', 'pkg3'
         ],
-        leftList: ['pkg4', 'pkg5']
+        leftList: ['pkg4', 'pkg5'],
+        id: 'a-test-pick-list',
+        leftLabel: 'Left Items',
+        rightLabel: 'Right Items'
       })
       const dom = pick.render()
-      expect(dom).toEqual(
-        <div className='package-pick-list'>
-          <PkgSelectList className='pick-list-left-list' on={{PkgSelectListChangeEvent: pick.handleLeftSelectListChange}} items={new Immutable.Set(['pkg4', 'pkg5'])} />
-          <div className='pick-list-button-col'>
-            <button onclick={pick.handleLeftButton} className='pick-list-btn-move-right'>&lt;&lt;</button>
-            <button onclick={pick.handleRightButton} className='pick-list-btn-move-left'>&gt;&gt;</button>
-          </div>
-          <PkgSelectList className='pick-list-right-list' on={{PkgSelectListChangeEvent: pick.handleRightSelectListChange}} items={new Immutable.Set(['pkg1', 'pkg2', 'pkg3'])} />
+      const expected = <div id='a-test-pick-list' className='package-pick-list'>
+        <div className='pick-list-left-list'>
+          <p className='pick-list-header'>Left Items</p>
+          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
         </div>
-      )
+        <div className='pick-list-right-list'>
+          <p className='pick-list-header'>Right Items</p>
+          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+        </div>
+      </div>
+      const diff = new DomDiff(dom, expected)
+      logger.debug(diff.toString())
+      expect(dom).toEqual(expected)
     })
 
     it('appends other properties to top-level div', () => {
@@ -83,19 +104,22 @@ describe('PkgPickList', () => {
           'pkg4', 'pkg5'
         ],
         id: 'my-pick-list',
-        kumquat: 'fruitbat'
+        kumquat: 'fruitbat',
+        leftLabel: 'fred',
+        rightLabel: 'barney'
       })
       const dom = pick.render()
-      expect(dom).toEqual(
-        <div className='package-pick-list' id='my-pick-list' kumquat='fruitbat'>
-          <PkgSelectList className='pick-list-left-list' on={{PkgSelectListChangeEvent: pick.handleLeftSelectListChange}} items={new Immutable.Set(['pkg4', 'pkg5'])} />
-          <div className='pick-list-button-col'>
-            <button onclick={pick.handleLeftButton} className='pick-list-btn-move-right'>&lt;&lt;</button>
-            <button onclick={pick.handleRightButton} className='pick-list-btn-move-left'>&gt;&gt;</button>
-          </div>
-          <PkgSelectList className='pick-list-right-list' on={{PkgSelectListChangeEvent: pick.handleRightSelectListChange}} items={new Immutable.Set(['pkg1', 'pkg2', 'pkg3'])} />
+      const expected = <div id='my-pick-list' className='package-pick-list' kumquat='fruitbat'>
+        <div className='pick-list-left-list'>
+          <p className='pick-list-header'>fred</p>
+          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
         </div>
-      )
+        <div className='pick-list-right-list'>
+          <p className='pick-list-header'>barney</p>
+          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+        </div>
+      </div>
+      expect(dom).toEqual(expected)
     })
 
     it('appends other classes to top-level div', () => {
@@ -109,16 +133,17 @@ describe('PkgPickList', () => {
         className: 'some-class some-other-class'
       })
       const dom = pick.render()
-      expect(dom).toEqual(
-        <div className='package-pick-list some-class some-other-class'>
-          <PkgSelectList className='pick-list-left-list' on={{PkgSelectListChangeEvent: pick.handleLeftSelectListChange}} items={new Immutable.Set(['pkg4', 'pkg5'])} />
-          <div className='pick-list-button-col'>
-            <button onclick={pick.handleLeftButton} className='pick-list-btn-move-right'>&lt;&lt;</button>
-            <button onclick={pick.handleRightButton} className='pick-list-btn-move-left'>&gt;&gt;</button>
-          </div>
-          <PkgSelectList className='pick-list-right-list' on={{PkgSelectListChangeEvent: pick.handleRightSelectListChange}} items={new Immutable.Set(['pkg1', 'pkg2', 'pkg3'])} />
+      const expected = <div className='some-class some-other-class package-pick-list'>
+        <div className='pick-list-left-list'>
+          <p className='pick-list-header'>{''}</p>
+          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
         </div>
-      )
+        <div className='pick-list-right-list'>
+          <p className='pick-list-header'>{''}</p>
+          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+        </div>
+      </div>
+      expect(dom).toEqual(expected)
     })
   })
 
@@ -133,23 +158,24 @@ describe('PkgPickList', () => {
       pick.move('right', 'pkg5').then(() => {
         expect(pick.leftList.toJS()).toEqual(['pkg4'])
         expect(pick.rightList.toJS()).toEqual(['pkg1', 'pkg2', 'pkg3', 'pkg5'])
-        let dom = pick.render()
+        let dom = pick.element
         expect(dom.children[0].props['items'].toJS()).toEqual(['pkg4'])
         expect(dom.children[2].props['items'].toJS()).toEqual(['pkg1', 'pkg2', 'pkg3', 'pkg5'])
-        expect(dom).toEqual(
-          <div className='package-pick-list'>
-            <PkgSelectList className='pick-list-left-list' on={{PkgSelectListChangeEvent: pick.handleLeftSelectListChange}} items={new Immutable.Set(['pkg4'])} />
-            <div className='pick-list-button-col'>
-              <button className='pick-list-btn-move-right'>&lt;&lt;</button>
-              <button className='pick-list-btn-move-left'>&gt;&gt;</button>
-            </div>
-            <PkgSelectList className='pick-list-right-list' on={{PkgSelectListChangeEvent: pick.handleRightSelectListChange}} items={new Immutable.Set(['pkg1', 'pkg2', 'pkg3', 'pkg5'])} />
+        const expected = <div className='package-pick-list'>
+          <div className='pick-list-left-list'>
+            <p className='pick-list-header'>{''}</p>
+            <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4']} emptyMessage={'no packages found'} />
           </div>
-        )
+          <div className='pick-list-right-list'>
+            <p className='pick-list-header'>{''}</p>
+            <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']} emptyMessage={'no packages selected'} />
+          </div>
+        </div>
+        expect(dom).toEqual(expected)
       })
     })
 
-    it('can move an item from right to right, and re-render.', () => {
+    it('can move an item from right to left, and re-render.', () => {
       const pick = new PkgPickList({
         rightList: [
           'pkg1', 'pkg2', 'pkg3'
@@ -159,35 +185,61 @@ describe('PkgPickList', () => {
       pick.move('left', 'pkg3').then(() => {
         expect(pick.leftList.toJS()).toEqual(['pkg4', 'pkg5', 'pkg3'])
         expect(pick.rightList.toJS()).toEqual(['pkg1', 'pkg2'])
-        let dom = pick.render()
+        let dom = pick.element
         expect(dom.children[0].props['items'].toJS()).toEqual(['pkg4', 'pkg5', 'pkg3'])
         expect(dom.children[2].props['items'].toJS()).toEqual(['pkg1', 'pkg2'])
-        expect(dom).toEqual(
-          <div className='package-pick-list'>
-            <PkgSelectList className='pick-list-left-list' items={new Immutable.Set(['pkg4'], 'pkg5', 'pkg3')} />
-            <div className='pick-list-button-col'>
-              <button className='pick-list-btn-move-right'>&lt;&lt;</button>
-              <button className='pick-list-btn-move-left'>&gt;&gt;</button>
-            </div>
-            <PkgSelectList className='pick-list-right-list' items={new Immutable.Set(['pkg1', 'pkg2'])} />
+        const expected = <div className='package-pick-list'>
+          <div className='pick-list-left-list'>
+            <p className='pick-list-header'>{''}</p>
+            <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5', 'pkg3']} emptyMessage={'no packages found'} />
           </div>
-        )
+          <div className='pick-list-right-list'>
+            <p className='pick-list-header'>{''}</p>
+            <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2']} emptyMessage={'no packages selected'} />
+          </div>
+        </div>
+        expect(dom).toEqual(expected)
       })
     })
   })
 
   describe('event handling', () => {
-    it('raises PickListMoveButtonEvent', () => {
+    it('raises change event', () => {
       const pick = new PkgPickList({
         rightList: [
           'pkg1', 'pkg2', 'pkg3'
         ],
         leftList: ['pkg4', 'pkg5']
       })
-      pick.move('right', 'pkg4')
+      let wasCalled = false
+      function changeCallback (evt) {
+        logger.debug(`raises change event: changeCallback called with ${evt}`)
+        expect(evt).toEqual(['right', 'pkg4'])
+        wasCalled = true
+      }
+      pick.onChange(changeCallback)
+      pick.move('right', 'pkg4').then(() => {
+        expect(wasCalled).toBe(true)
+      })
     })
-    it('responds to PkgSelectListChangeEvent', () => {
 
+    it('responds to click in select list', () => {
+      let wasCalled = false
+      function changeCallback (evt) {
+        logger.debug(`responds to click: changeCallback called with ${evt}`)
+        expect(evt).toEqual(['right', 'pkg4'])
+        wasCalled = true
+      }
+      const pick = <PkgPickList rightList={['pkg1', 'pkg2', 'pkg3']} leftList={['pkg4', 'pkg5']} onChange={changeCallback} />
+      let newElem = document.createElement('div')
+      let dom = etch.render(pick)
+      newElem.appendChild(dom)
+      /* sheesh. XPath library, anyone? */
+      let pkg5Li = newElem.children[0].children[0].children[1].children[0].children[1]
+      expect(pkg5Li.tagName).toEqual('LI')
+      expect(pkg5Li.innerHTML).toEqual('pkg5')  // got the right element
+      pkg5Li.click()
+      expect(wasCalled).toBe(true)
     })
   })
 })
