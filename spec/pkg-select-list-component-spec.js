@@ -2,9 +2,9 @@
 /** @jsx etch.dom */
 
 /* eslint-env jasmine */
-import etch from 'etch'
 import log4js from 'log4js'
-import PkgSelectList, {_ListItemView} from '../lib/pkg-select-list-component'
+import PkgSelectList from '../lib/pkg-select-list-component'
+import DomDiff from '../lib/pkg-groups-dom-diff' // eslint-disable-line no-unused-vars
 
 const logger = log4js.getLogger('pkg-groups-group-spec')
 logger.level = 'debug'
@@ -17,7 +17,7 @@ describe('PkgSelectList component', () => {
           'item1', 'item2', 'item3'
         ]
       })
-      expect(comp.items).toEqual(['item1', 'item2', 'item3'])
+      expect(comp.props.items).toEqual(['item1', 'item2', 'item3'])
       expect(comp.element.classList.contains('pkg-select-list')).toBe(true)
     })
 
@@ -29,35 +29,33 @@ describe('PkgSelectList component', () => {
         infoMessage: 'the more you know...',
         loadingMessage: 'hey, I\'m loading here',
         loadingBadge: 'a silly badge',
-        itemsClassList: ['class1', 'class2'],
-        didChangeSelection: event => console.log('wow something changed'),
-        skipCommandsRegistration: true
+        skipCommandsRegistration: true,
+        selectableItems: false,
+        on: {change: 'fred'}
       }
       const psl = new PkgSelectList(props)
-      expect(psl.items).toEqual(props.items)
+      expect(psl.props.items).toEqual(props.items)
       expect(psl.props.emptyMessage).toEqual(props.emptyMessage)
       expect(psl.props.errorMessage).toEqual(props.errorMessage)
       expect(psl.props.infoMessage).toEqual(props.infoMessage)
       expect(psl.props.loadingMessage).toEqual(props.loadingMessage)
       expect(psl.props.loadingBadge).toEqual(props.loadingBadge)
-      expect(psl.props.itemsClassList).toEqual(props.itemsClassList)
-      expect(psl.props.didChangeSelection).toBe(props.didChangeSelection)
       expect(psl.props.skipCommandsRegistration).toBe(true)
+      expect(psl.props.selectableItems).toBe(false)
+      expect(psl.props.on.change).toEqual('fred')
     })
   })
 
   describe('render', () => {
     it('renders the simplest case OK', () => {
-      const elementForItem = item => etch.render(<li>{item}</li>)
       const comp = new PkgSelectList({
         items: [
           'item1', 'item2', 'item3'
-        ],
-        elementForItem: elementForItem
+        ]
       })
       const actual = comp.render()
       const itemSet = new Set(['item1', 'item2', 'item3'])
-      // alas, there's no way to use equal to compare these
+      // alas, there's no way to use equal to compare these (?)
       expect(actual.tag).toEqual('div')
       expect(actual.props.className).toEqual('select-list pkg-select-list')
       expect(actual.children.length).toBe(1)
@@ -65,12 +63,11 @@ describe('PkgSelectList component', () => {
       expect(actual.children[0].props.className).toEqual('list-group')
       expect(actual.children[0].props.ref).toEqual('items')
       for (let liv of actual.children[0].children) {
-        expect(liv.tag).toEqual(_ListItemView)
-        expect(liv.props.selected).toBe(false)
-        expect(liv.props.onclick).toBe(comp.didClickItem)
-        expect(liv.children.length).toBe(0)
-        expect(liv.props.element.nodeName).toEqual('LI')
-        expect(itemSet.has(liv.props.element.textContent)).toBe(true)
+        expect(liv.tag).toEqual('li')
+        expect(liv.props.className).toBe('')
+        expect(liv.props.on.click).toBe(comp.didClickItem)
+        expect(liv.children.length).toBe(1)
+        expect(itemSet.has(liv.children[0].text)).toBe(true)
       }
     })
 
@@ -80,7 +77,7 @@ describe('PkgSelectList component', () => {
           'item1', 'item2', 'item3'
         ]
       })
-      comp.selectFirst()
+      comp.props.selectionIndex = 0
       const actual = comp.render()
       const itemSet = new Set(['item1', 'item2', 'item3'])
       // alas, there's no way to use equal to compare these
@@ -91,150 +88,129 @@ describe('PkgSelectList component', () => {
       expect(actual.children[0].props.className).toEqual('list-group')
       expect(actual.children[0].props.ref).toEqual('items')
       for (let liv of actual.children[0].children) {
-        expect(liv.tag).toEqual(_ListItemView)
-        expect(liv.props.onclick).toBe(comp.didClickItem)
-        expect(liv.children.length).toBe(0)
-        expect(liv.props.element.nodeName).toEqual('LI')
-        expect(itemSet.has(liv.props.element.textContent)).toBe(true)
+        expect(liv.tag).toEqual('li')
+        expect(liv.props.on.click).toBe(comp.didClickItem)
+        expect(liv.children.length).toBe(1)
+        expect(itemSet.has(liv.children[0].text)).toBe(true)
       }
-      expect(actual.children[0].children[0].props.selected).toBe(true)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(false)
+      // logger.debug(actual.children[0].children[0])
+      expect(actual.children[0].children[0].props.className).toEqual('selected')
+      expect(actual.children[0].children[1].props.className).toEqual('')
+      expect(actual.children[0].children[2].props.className).toEqual('')
     })
 
-    it('can update selection', () => {
-      const elementForItem = item => etch.render(<li>{item}</li>)
+    it('optionally does not select items', () => {
       const comp = new PkgSelectList({
         items: [
           'item1', 'item2', 'item3'
         ],
-        elementForItem: elementForItem
+        selectableItems: false
       })
-      comp.selectFirst()
-      expect(comp.selectionIndex).toBe(0)
+      comp.props.selectionIndex = 0
       let actual = comp.render()
-      expect(actual.children[0].children[0].props.selected).toBe(true)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(false)
-      comp.selectIndex(2)
-      actual = comp.render()
-      expect(comp.selectionIndex).toBe(2)
-      expect(actual.children[0].children[0].props.selected).toBe(false)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(true)
+      expect(comp.props.selectableItems).toBe(false)
+      expect(comp.props.selectionIndex).toEqual(0)
+      expect(actual.children[0].children[0].props.className).toEqual('')
+      expect(actual.children[0].children[1].props.className).toEqual('')
+      expect(actual.children[0].children[2].props.className).toEqual('')
+    })
+  })
+
+  describe('selectIndex', () => {
+    it('can update selection', () => {
+      const comp = new PkgSelectList({
+        items: [
+          'item1', 'item2', 'item3'
+        ]
+      })
+      comp.selectFirst().then(() => {
+        expect(comp.props.selectionIndex).toBe(0)
+        let actual = comp.virtualNode
+        expect(actual.children[0].children[0].props.className).toEqual('selected')
+        expect(actual.children[0].children[1].props.className).toEqual('')
+        expect(actual.children[0].children[2].props.className).toEqual('')
+        comp.selectIndex(2).then(() => {
+          actual = comp.virtualNode
+          expect(comp.props.selectionIndex).toBe(2)
+          expect(actual.children[0].children[0].props.className).toEqual('')
+          expect(actual.children[0].children[1].props.className).toEqual('')
+          expect(actual.children[0].children[2].props.className).toEqual('selected')
+        })
+      })
     })
 
     it('triggers callback on change', () => {
       let evts = []
-      const onChange = function (evt) {
-        evts.push(evt)
+      const onChange = function (item) {
+        evts.push(item)
       }
-      const elementForItem = item => etch.render(<li>{item}</li>)
       const comp = new PkgSelectList({
         items: [
           'item1', 'item2', 'item3'
         ],
-        elementForItem: elementForItem,
-        didChangeSelection: onChange
+        on: {change: onChange}
       })
-      expect(comp.props.didChangeSelection).toBe(onChange)
-      comp.selectFirst()
-      expect(evts).toEqual(['item1'])
-      let actual = comp.render()
-      expect(comp.selectionIndex).toBe(0)
-      expect(actual.children[0].children[0].props.selected).toBe(true)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(false)
-      comp.selectLast()
-      expect(evts).toEqual(['item1', 'item3'])
-      actual = comp.render()
-      expect(comp.selectionIndex).toBe(2)
-      expect(actual.children[0].children[0].props.selected).toBe(false)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(true)
-      expect(evts.length).toBe(2)
+      comp.selectFirst().then(() => {
+        expect(evts).toEqual(['item1'])
+        let actual = comp.virtualNode
+        expect(comp.props.selectionIndex).toBe(0)
+        expect(actual.children[0].children[0].props.className).toEqual('selected')
+        expect(actual.children[0].children[1].props.className).toEqual('')
+        expect(actual.children[0].children[2].props.className).toEqual('')
+        comp.selectLast().then(() => {
+          expect(evts).toEqual(['item1', 'item3'])
+          actual = comp.virtualNode
+          expect(comp.props.selectionIndex).toBe(2)
+          expect(actual.children[0].children[0].props.className).toEqual('')
+          expect(actual.children[0].children[1].props.className).toEqual('')
+          expect(actual.children[0].children[2].props.className).toEqual('selected')
+          expect(evts.length).toBe(2)
+        })
+      })
     })
+  })
 
+  describe('event handling', () => {
     it('handles click events', () => {
       let evts = []
-      const onChange = function (evt) {
-        evts.push(evt)
+      const onChange = function (item, index) {
+        evts.push(item)
       }
-      const elementForItem = item => etch.render(<li>{item}</li>)
       const comp = new PkgSelectList({
         items: [
           'item1', 'item2', 'item3'
         ],
-        elementForItem: elementForItem,
-        didChangeSelection: onChange
+        on: {change: onChange}
       })
-      expect(comp.props.didChangeSelection).toBe(onChange)
-      let actual = comp.render()
-
+      expect(comp.selectionIndex).toBe(undefined)
       // click on item 1
       comp.element.children[0].children[0].click()
 
-      expect(evts).toEqual(['item1'])
-      expect(comp.selectionIndex).toBe(0)
-      actual = comp.render()
-      expect(actual.children[0].children[0].props.selected).toBe(true)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(false)
-      expect(actual.children[0].children[0].props.element.className).toBe('selected')
+      waitsFor(() => evts.length > 0)
 
-      // click on item 3
-      comp.element.children[0].children[2].click()
+      runs(() => {
+        expect(evts).toEqual(['item1'])
+        expect(comp.props.selectionIndex).toBe(0)
+        expect(comp.props.selectableItems).toBe(true)
+        let actual = comp.virtualNode
+        expect(actual.children[0].children[0].props.className).toEqual('selected')
+        expect(actual.children[0].children[1].props.className).toEqual('')
+        expect(actual.children[0].children[2].props.className).toEqual('')
 
-      expect(evts).toEqual(['item1', 'item3'])
-      expect(comp.selectionIndex).toBe(2)
-      expect(evts.length).toBe(2)
-      actual = comp.render()
-      expect(actual.children[0].children[0].props.selected).toBe(false)
-      expect(actual.children[0].children[1].props.selected).toBe(false)
-      expect(actual.children[0].children[2].props.selected).toBe(true)
-      expect(actual.children[0].children[0].props.element.className).toBe('')
-      expect(actual.children[0].children[1].props.element.className).toBe('')
-      expect(actual.children[0].children[2].props.element.className).toBe('selected')
+        // click on item 3
+        comp.element.children[0].children[2].click()
+
+        waitsFor(() => evts.length > 1)
+
+        runs(() => {
+          expect(evts).toEqual(['item1', 'item3'])
+          expect(comp.props.selectionIndex).toBe(2)
+          let actual = comp.virtualNode
+          expect(actual.children[0].children[0].props.className).toEqual('')
+          expect(actual.children[0].children[1].props.className).toEqual('')
+          expect(actual.children[0].children[2].props.className).toEqual('selected')
+        })
+      })
     })
-  })
-})
-
-describe('_ListItemView component', () => {
-  it('sets up an onclick handler', () => {
-    // cheap substitute for jasmine's spy
-    let wasCalled = false
-    const onClick = (event) => {
-      wasCalled = true
-    }
-    const elem = etch.render(<li>Some Item</li>)
-    const liv = new _ListItemView({element: elem, selected: false, onclick: onClick})
-    liv.element.click()
-    expect(wasCalled).toBe(true)
-  })
-
-  it('sets a class name for a selected item', () => {
-    const elem = etch.render(<li>Some Item</li>)
-    const liv = new _ListItemView({element: elem, selected: true})
-    expect(liv.element.classList.contains('selected')).toBe(true)
-  })
-
-  it('updates correctly', () => {
-    // cheap substitute for jasmine's spy
-    let wasCalled = false
-    const onClick = (event) => {
-      wasCalled = true
-    }
-    // note update requires element to have  parent
-    const elem = etch.render(<div><li>Some Item</li></div>).children[0]
-    const liv = new _ListItemView({element: elem, selected: false})
-    expect(liv.element).toBe(elem)
-    expect(liv.element.classList.contains('selected')).toBe(false)
-    const elem2 = etch.render(<li>Other Item</li>)
-    liv.update({element: elem2, selected: true, onclick: onClick})
-    expect(liv.element).toBe(elem2)
-    expect(liv.element.classList.contains('selected')).toBe(true)
-    expect(wasCalled).toBe(false)
-    liv.element.click()
-    expect(wasCalled).toBe(true)
   })
 })
