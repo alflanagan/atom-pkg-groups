@@ -5,7 +5,6 @@
  * note: env setting is read from package.json calling 'standard' from command
  *   line, but not when atom-ide-ui does diagnostics. Bug?
  */
-
 /* eslint-env jasmine */
 
 import etch from 'etch'
@@ -53,20 +52,40 @@ describe('PkgPickList', () => {
   describe('render', () => {
     it('renders with empty lists', () => {
       const fred = new PkgPickList()
-      const dom = fred.render()
+      const dom = fred.virtualNode
+      // we're not testing PkgSelectList, so just accept what was rendered
+      const leftList = <PkgSelectList on={{change: fred.didClickLeftItem}} items={[]}
+        emptyMessage={'no packages found'} selectableItems={false} />
+      const rightList = <PkgSelectList on={{change: fred.didClickRightItem}} items={[]}
+        emptyMessage={'no packages selected'} selectableItems={false} />
+
       const expected = <div id='' className='package-pick-list'>
         <div className='pick-list-left-list'>
           <p className='pick-list-header'>{''}</p>
-          <PkgSelectList didChangeSelection={fred.didClickLeftItem} items={[]} emptyMessage={'no packages found'} />
+          {leftList}
         </div>
         <div className='pick-list-right-list'>
           <p className='pick-list-header'>{''}</p>
-          <PkgSelectList didChangeSelection={fred.didClickRightItem} items={[]} emptyMessage={'no packages selected'} />
+          {rightList}
         </div>
       </div>
+      /*
+       *  <div {...passThroughProps}>
+         <div className='pick-list-left-list'>
+           <p className='pick-list-header'>{this.props.leftLabel}</p>
+           <PkgSelectList on={{change: this.didClickLeftItem}} items={leftItems}
+             emptyMessage={'no packages found'} selectableItems={false} />
+         </div>
+         <div className='pick-list-right-list'>
+           <p className='pick-list-header'>{this.props.rightLabel}</p>
+           <PkgSelectList on={{change: this.didClickRightItem}} items={rightItems}
+             emptyMessage={'no packages selected'} selectableItems={false} />
+         </div>
+       </div>
+       */
       const diff = new DomDiff(dom, expected)
       logger.debug(diff.toString())
-      expect(dom).toEqual(expected)
+      expect(diff.noDifferences()).toBe(true)
     })
 
     it('renders lists as expected', () => {
@@ -83,11 +102,13 @@ describe('PkgPickList', () => {
       const expected = <div id='a-test-pick-list' className='package-pick-list'>
         <div className='pick-list-left-list'>
           <p className='pick-list-header'>Left Items</p>
-          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
+          <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5']}
+            emptyMessage={'no packages found'} selectableItems={false} />
         </div>
         <div className='pick-list-right-list'>
           <p className='pick-list-header'>Right Items</p>
-          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+          <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3']}
+            emptyMessage={'no packages selected'} selectableItems={false} />
         </div>
       </div>
       const diff = new DomDiff(dom, expected)
@@ -112,11 +133,13 @@ describe('PkgPickList', () => {
       const expected = <div id='my-pick-list' className='package-pick-list' kumquat='fruitbat'>
         <div className='pick-list-left-list'>
           <p className='pick-list-header'>fred</p>
-          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
+          <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5']}
+            emptyMessage={'no packages found'} selectableItems={false} />
         </div>
         <div className='pick-list-right-list'>
           <p className='pick-list-header'>barney</p>
-          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+          <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3']}
+            emptyMessage={'no packages selected'} selectableItems={false} />
         </div>
       </div>
       expect(dom).toEqual(expected)
@@ -136,11 +159,13 @@ describe('PkgPickList', () => {
       const expected = <div className='some-class some-other-class package-pick-list'>
         <div className='pick-list-left-list'>
           <p className='pick-list-header'>{''}</p>
-          <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5']} emptyMessage={'no packages found'} />
+          <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5']}
+            emptyMessage={'no packages found'} selectableItems={false} />
         </div>
         <div className='pick-list-right-list'>
           <p className='pick-list-header'>{''}</p>
-          <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3']} emptyMessage={'no packages selected'} />
+          <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3']}
+            emptyMessage={'no packages selected'} selectableItems={false} />
         </div>
       </div>
       expect(dom).toEqual(expected)
@@ -164,11 +189,13 @@ describe('PkgPickList', () => {
         const expected = <div className='package-pick-list'>
           <div className='pick-list-left-list'>
             <p className='pick-list-header'>{''}</p>
-            <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4']} emptyMessage={'no packages found'} />
+            <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4']}
+              emptyMessage={'no packages found'} selectableItems={false} />
           </div>
           <div className='pick-list-right-list'>
             <p className='pick-list-header'>{''}</p>
-            <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']} emptyMessage={'no packages selected'} />
+            <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']}
+              emptyMessage={'no packages selected'} selectableItems={false} />
           </div>
         </div>
         expect(dom).toEqual(expected)
@@ -191,11 +218,13 @@ describe('PkgPickList', () => {
         const expected = <div className='package-pick-list'>
           <div className='pick-list-left-list'>
             <p className='pick-list-header'>{''}</p>
-            <PkgSelectList didChangeSelection={pick.didClickLeftItem} items={['pkg4', 'pkg5', 'pkg3']} emptyMessage={'no packages found'} />
+            <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5', 'pkg3']}
+              emptyMessage={'no packages found'} selectableItems={false} />
           </div>
           <div className='pick-list-right-list'>
             <p className='pick-list-header'>{''}</p>
-            <PkgSelectList didChangeSelection={pick.didClickRightItem} items={['pkg1', 'pkg2']} emptyMessage={'no packages selected'} />
+            <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2']}
+              emptyMessage={'no packages selected'} selectableItems={false} />
           </div>
         </div>
         expect(dom).toEqual(expected)
@@ -205,19 +234,20 @@ describe('PkgPickList', () => {
 
   describe('event handling', () => {
     it('raises change event', () => {
+      let wasCalled = false
+      const changeCallback = evt => {
+        logger.debug(`raises change event: changeCallback called with ${evt}`)
+        expect(evt.data).toEqual(['right', 'pkg4'])
+        wasCalled = true
+      }
       const pick = new PkgPickList({
         rightList: [
           'pkg1', 'pkg2', 'pkg3'
         ],
-        leftList: ['pkg4', 'pkg5']
+        leftList: ['pkg4', 'pkg5'],
+        on: {change: changeCallback}
       })
-      let wasCalled = false
-      function changeCallback (evt) {
-        logger.debug(`raises change event: changeCallback called with ${evt}`)
-        expect(evt).toEqual(['right', 'pkg4'])
-        wasCalled = true
-      }
-      pick.onChange(changeCallback)
+
       pick.move('right', 'pkg4').then(() => {
         expect(wasCalled).toBe(true)
       })
@@ -227,10 +257,10 @@ describe('PkgPickList', () => {
       let wasCalled = false
       function changeCallback (evt) {
         logger.debug(`responds to click: changeCallback called with ${evt}`)
-        expect(evt).toEqual(['right', 'pkg4'])
+        expect(evt.data).toEqual(['right', 'pkg5'])
         wasCalled = true
       }
-      const pick = <PkgPickList rightList={['pkg1', 'pkg2', 'pkg3']} leftList={['pkg4', 'pkg5']} onChange={changeCallback} />
+      const pick = <PkgPickList rightList={['pkg1', 'pkg2', 'pkg3']} leftList={['pkg4', 'pkg5']} on={{change: changeCallback}} />
       let newElem = document.createElement('div')
       let dom = etch.render(pick)
       newElem.appendChild(dom)
@@ -239,7 +269,8 @@ describe('PkgPickList', () => {
       expect(pkg5Li.tagName).toEqual('LI')
       expect(pkg5Li.innerHTML).toEqual('pkg5')  // got the right element
       pkg5Li.click()
-      expect(wasCalled).toBe(true)
+      waitsFor(() => wasCalled)
+      runs(() => expect(wasCalled).toBe(true))
     })
   })
 })
