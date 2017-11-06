@@ -2,7 +2,7 @@
 /** @jsx etch.dom */
 
 /* eslint-env jasmine */
-import {addIfMissing, firstTrue} from '../lib/pkg-groups-functions'
+import {addIfMissing, firstTrue, objectEqual} from '../lib/pkg-groups-functions'
 import log4js from 'log4js'
 
 const logger = log4js.getLogger('pkg-groups-functions-spec')
@@ -59,8 +59,51 @@ describe('firstTrue', () => {
     expect(fred).toEqual('three')
   })
 
-  it('throw error if all cases are false (and no default)', () => {
+  it('throws an error if all cases are false (and no default)', () => {
     const badCall = () => firstTrue(false, () => 'bad', false, () => 'call')
     expect(badCall).toThrow('firstTrue: all conditions were false, and no else value was found')
+  })
+})
+
+describe('objectEqual', () => {
+  it('returns true for empty objects', () => {
+    const empty1 = {}
+    const empty2 = {}
+    expect(empty1 === empty2).toBe(false)
+    // because jasmine has its own object equality
+    expect(empty1).toEqual(empty2)
+    expect(objectEqual(empty1, empty2)).toBe(true)
+  })
+
+  it('returns true for simple key-value pairs', () => {
+    let fred = {a: 7, b: 'hello', fred: 'barney'}
+    let barney = {a: 7, b: 'hello', fred: 'barney'}
+    expect(fred === barney).toBe(false)
+    expect(fred).toEqual(barney)
+    expect(objectEqual(fred, barney)).toBe(true)
+  })
+
+  it('handles object values', () => {
+    let obj1 = {a: 7, b: {c: 8, d: 9}, e: 'fred'}
+    let obj2 = {a: 7, b: {c: 8, d: 9}, e: 'fred'}
+    expect(obj1 === obj2).toBe(false)
+    expect(obj1).toEqual(obj2)
+    expect(objectEqual(obj1, obj2)).toBe(true)
+  })
+
+  it('handles array values', () => {
+    let obj1 = {a: 7, b: ['c', 8, 'd', 9], e: 'fred'}
+    let obj2 = {a: 7, b: ['c', 8, 'd', 9], e: 'fred'}
+    expect(obj1 === obj2).toBe(false)
+    expect(obj1).toEqual(obj2)
+    expect(objectEqual(obj1, obj2)).toBe(true)
+  })
+
+  it('handles object values that are objects and arrays', () => {
+    let obj1 = {a: 7, b: {c: 8, d: {f: 12, g: [1, 2, 3]}}, e: 'fred'}
+    let obj2 = {a: 7, b: {c: 8, d: {f: 12, g: [1, 2, 3]}}, e: 'fred'}
+    expect(obj1 === obj2).toBe(false)
+    expect(obj1).toEqual(obj2)
+    expect(objectEqual(obj1, obj2)).toBe(true)
   })
 })
