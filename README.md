@@ -1,7 +1,13 @@
 # pkg-groups package
 
-This is an Atom editor package to allow you to create groups of packages, and
+[![Build Status](https://travis-ci.org/alflanagan/atom-pkg-groups.svg?branch=master)](https://travis-ci.org/alflanagan/atom-pkg-groups)
+
+This is an [Atom editor](https://atom.io) package to allow you to create groups of packages, and
 enable/disable them all at once.
+
+## A Solution to Your Package Population Problem?
+
+Right now my standard setup for Atom includes installing 73 community-supplied extension packages.
 
 Why you might not want all your packages enabled:
 
@@ -29,3 +35,7 @@ A configuration is one or more groups, where each group has a status of "enabled
 ### Activation
 
 You define your current setup by selecting configurations for "activation", meaning they enable or disable the packages contained within. Configurations which are not "active" do not have an effect.
+
+## A note on testing
+
+Because of a large backlog of OSX testing resources on the free service [Travis-CI](https://www.travis-ci.org) (see [this issue](https://github.com/travis-ci/travis-ci/issues/7304)), I've disabled testing on OSX. I'll re-enable tests if a) we have a lot of Mac users, or b) start getting error reports from Macs.
