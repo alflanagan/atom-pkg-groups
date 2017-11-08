@@ -52,7 +52,7 @@ describe('PkgPickList', () => {
   describe('render', () => {
     it('renders with empty lists', () => {
       const fred = new PkgPickList()
-      const dom = fred.virtualNode
+      const dom = fred.render()
       // we're not testing PkgSelectList, so just accept what was rendered
       const leftList = <PkgSelectList on={{change: fred.didClickLeftItem}} items={[]}
         emptyMessage={'no packages found'} selectableItems={false} />
@@ -69,20 +69,7 @@ describe('PkgPickList', () => {
           {rightList}
         </div>
       </div>
-      /*
-       *  <div {...passThroughProps}>
-         <div className='pick-list-left-list'>
-           <p className='pick-list-header'>{this.props.leftLabel}</p>
-           <PkgSelectList on={{change: this.didClickLeftItem}} items={leftItems}
-             emptyMessage={'no packages found'} selectableItems={false} />
-         </div>
-         <div className='pick-list-right-list'>
-           <p className='pick-list-header'>{this.props.rightLabel}</p>
-           <PkgSelectList on={{change: this.didClickRightItem}} items={rightItems}
-             emptyMessage={'no packages selected'} selectableItems={false} />
-         </div>
-       </div>
-       */
+      expect(dom).toEqual(expected)
       const diff = new DomDiff(dom, expected)
       logger.debug(diff.toString())
       expect(diff.noDifferences()).toBe(true)
@@ -114,6 +101,7 @@ describe('PkgPickList', () => {
       const diff = new DomDiff(dom, expected)
       logger.debug(diff.toString())
       expect(dom).toEqual(expected)
+      expect(diff.noDifferences()).toBe(true)
     })
 
     it('appends other properties to top-level div', () => {
@@ -180,25 +168,22 @@ describe('PkgPickList', () => {
         ],
         leftList: ['pkg4', 'pkg5']
       })
-      pick.move('right', 'pkg5').then(() => {
-        expect(pick.leftList.toJS()).toEqual(['pkg4'])
-        expect(pick.rightList.toJS()).toEqual(['pkg1', 'pkg2', 'pkg3', 'pkg5'])
-        let dom = pick.element
-        expect(dom.children[0].props['items'].toJS()).toEqual(['pkg4'])
-        expect(dom.children[2].props['items'].toJS()).toEqual(['pkg1', 'pkg2', 'pkg3', 'pkg5'])
-        const expected = <div className='package-pick-list'>
-          <div className='pick-list-left-list'>
-            <p className='pick-list-header'>{''}</p>
-            <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4']}
-              emptyMessage={'no packages found'} selectableItems={false} />
+      waitsForPromise(() => {
+        return pick.move('right', 'pkg5').then(() => {
+          const expected = <div className='package-pick-list'>
+            <div className='pick-list-left-list'>
+              <p className='pick-list-header'>{''}</p>
+              <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4']}
+                emptyMessage={'no packages found'} selectableItems={false} />
+            </div>
+            <div className='pick-list-right-list'>
+              <p className='pick-list-header'>{''}</p>
+              <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']}
+                emptyMessage={'no packages selected'} selectableItems={false} />
+            </div>
           </div>
-          <div className='pick-list-right-list'>
-            <p className='pick-list-header'>{''}</p>
-            <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']}
-              emptyMessage={'no packages selected'} selectableItems={false} />
-          </div>
-        </div>
-        expect(dom).toEqual(expected)
+          expect(pick.render()).toEqual(expected)
+        })
       })
     })
 
@@ -209,37 +194,27 @@ describe('PkgPickList', () => {
         ],
         leftList: ['pkg4', 'pkg5']
       })
-      pick.move('left', 'pkg3').then(() => {
-        expect(pick.leftList.toJS()).toEqual(['pkg4', 'pkg5', 'pkg3'])
-        expect(pick.rightList.toJS()).toEqual(['pkg1', 'pkg2'])
-        let dom = pick.element
-        expect(dom.children[0].props['items'].toJS()).toEqual(['pkg4', 'pkg5', 'pkg3'])
-        expect(dom.children[2].props['items'].toJS()).toEqual(['pkg1', 'pkg2'])
-        const expected = <div className='package-pick-list'>
-          <div className='pick-list-left-list'>
-            <p className='pick-list-header'>{''}</p>
-            <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5', 'pkg3']}
-              emptyMessage={'no packages found'} selectableItems={false} />
+      waitsForPromise(() => {
+        return pick.move('left', 'pkg3').then(() => {
+          const expected = <div className='package-pick-list'>
+            <div className='pick-list-left-list'>
+              <p className='pick-list-header'>{''}</p>
+              <PkgSelectList on={{change: pick.didClickLeftItem}} items={['pkg4', 'pkg5', 'pkg3']}
+                emptyMessage={'no packages found'} selectableItems={false} />
+            </div>
+            <div className='pick-list-right-list'>
+              <p className='pick-list-header'>{''}</p>
+              <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2']}
+                emptyMessage={'no packages selected'} selectableItems={false} />
+            </div>
           </div>
-          <div className='pick-list-right-list'>
-            <p className='pick-list-header'>{''}</p>
-            <PkgSelectList on={{change: pick.didClickRightItem}} items={['pkg1', 'pkg2']}
-              emptyMessage={'no packages selected'} selectableItems={false} />
-          </div>
-        </div>
-        expect(dom).toEqual(expected)
+          expect(pick.render()).toEqual(expected)
+        })
       })
     })
-  })
 
-  describe('event handling', () => {
     it('raises change event', () => {
-      let wasCalled = false
-      const changeCallback = evt => {
-        logger.debug(`raises change event: changeCallback called with ${evt}`)
-        expect(evt.data).toEqual(['right', 'pkg4'])
-        wasCalled = true
-      }
+      const changeCallback = jasmine.createSpy('changeCallback')
       const pick = new PkgPickList({
         rightList: [
           'pkg1', 'pkg2', 'pkg3'
@@ -248,18 +223,17 @@ describe('PkgPickList', () => {
         on: {change: changeCallback}
       })
 
-      pick.move('right', 'pkg4').then(() => {
-        expect(wasCalled).toBe(true)
+      waitsForPromise(() => {
+        return pick.move('right', 'pkg4').then(() => {
+          expect(changeCallback).toHaveBeenCalledWith({data: ['right', 'pkg4']})
+        })
       })
     })
+  })
 
-    it('responds to click in select list', () => {
-      let wasCalled = false
-      function changeCallback (evt) {
-        logger.debug(`responds to click: changeCallback called with ${evt}`)
-        expect(evt.data).toEqual(['right', 'pkg5'])
-        wasCalled = true
-      }
+  describe('event handling', () => {
+    it('responds to click in left select list', () => {
+      const changeCallback = jasmine.createSpy('changeCallback')
       const pick = <PkgPickList rightList={['pkg1', 'pkg2', 'pkg3']} leftList={['pkg4', 'pkg5']} on={{change: changeCallback}} />
       let newElem = document.createElement('div')
       let dom = etch.render(pick)
@@ -269,8 +243,69 @@ describe('PkgPickList', () => {
       expect(pkg5Li.tagName).toEqual('LI')
       expect(pkg5Li.innerHTML).toEqual('pkg5')  // got the right element
       pkg5Li.click()
-      waitsFor(() => wasCalled)
-      runs(() => expect(wasCalled).toBe(true))
+      waitsFor(() => changeCallback.calls.length === 1)
+      runs(() => {
+        expect(changeCallback).toHaveBeenCalledWith({data: ['right', 'pkg5']})
+        const leftFunc = pick.component.virtualNode.children[0].children[1].props.on.change
+        const rightFunc = pick.component.virtualNode.children[1].children[1].props.on.change
+        const leftList = <PkgSelectList on={{change: leftFunc}} items={['pkg4']}
+          emptyMessage={'no packages found'} selectableItems={false} />
+        const rightList = <PkgSelectList on={{change: rightFunc}} items={['pkg1', 'pkg2', 'pkg3', 'pkg5']}
+          emptyMessage={'no packages selected'} selectableItems={false} />
+
+        const expected = <div on={{change: changeCallback}} className='package-pick-list'>
+          <div className='pick-list-left-list'>
+            <p className='pick-list-header'>{''}</p>
+            {leftList}
+          </div>
+          <div className='pick-list-right-list'>
+            <p className='pick-list-header'>{''}</p>
+            {rightList}
+          </div>
+        </div>
+
+        const diff = new DomDiff(pick.component.virtualNode, expected)
+        logger.debug(diff.toString())
+        expect(diff.noDifferences()).toBe(true)
+      })
+    })
+
+    it('responds to click in right select list', () => {
+      const changeCallback2 = jasmine.createSpy('changeCallback2')
+      const pick = <PkgPickList rightList={['pkg1', 'pkg2', 'pkg3']} leftList={['pkg4', 'pkg5']} on={{change: changeCallback2}} />
+      let newElem = document.createElement('div')
+      let dom = etch.render(pick)
+      newElem.appendChild(dom)
+      /* sheesh. XPath library, anyone? */
+      const pkg2Li = newElem.children[0].children[1].children[1].children[0].children[1]
+      expect(pkg2Li.tagName).toEqual('LI')
+      expect(pkg2Li.innerHTML).toEqual('pkg2')  // got the right element
+      pkg2Li.click()
+      waitsFor(() => changeCallback2.calls.length === 1)
+      runs(() => {
+        expect(changeCallback2).toHaveBeenCalledWith({data: ['left', 'pkg2']})
+        const leftFunc = pick.component.virtualNode.children[0].children[1].props.on.change
+        const rightFunc = pick.component.virtualNode.children[1].children[1].props.on.change
+        const leftList = <PkgSelectList on={{change: leftFunc}} items={['pkg4', 'pkg5', 'pkg2']}
+          emptyMessage={'no packages found'} selectableItems={false} />
+        const rightList = <PkgSelectList on={{change: rightFunc}} items={['pkg1', 'pkg3', 'pkg5']}
+          emptyMessage={'no packages selected'} selectableItems={false} />
+
+        const expected = <div on={{change: changeCallback2}} className='package-pick-list'>
+          <div className='pick-list-left-list'>
+            <p className='pick-list-header'>{''}</p>
+            {leftList}
+          </div>
+          <div className='pick-list-right-list'>
+            <p className='pick-list-header'>{''}</p>
+            {rightList}
+          </div>
+        </div>
+
+        const diff = new DomDiff(pick.component.virtualNode, expected)
+        logger.debug(diff.toString())
+        expect(diff.noDifferences()).toBe(true)
+      })
     })
   })
 })
