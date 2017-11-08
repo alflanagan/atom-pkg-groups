@@ -3,11 +3,12 @@
 
 /* eslint-env jasmine */
 import log4js from 'log4js'
+import etch from 'etch'
 import PkgSelectList from '../lib/pkg-select-list-component'
 import DomDiff from '../lib/pkg-groups-dom-diff' // eslint-disable-line no-unused-vars
 
 const logger = log4js.getLogger('pkg-groups-group-spec')
-logger.level = 'debug'
+logger.level = 'warn'
 
 describe('PkgSelectList component', () => {
   describe('constructor', () => {
@@ -54,21 +55,14 @@ describe('PkgSelectList component', () => {
         ]
       })
       const actual = comp.render()
-      const itemSet = new Set(['item1', 'item2', 'item3'])
-      // alas, there's no way to use equal to compare these (?)
-      expect(actual.tag).toEqual('div')
-      expect(actual.props.className).toEqual('select-list pkg-select-list')
-      expect(actual.children.length).toBe(1)
-      expect(actual.children[0].tag).toEqual('ol')
-      expect(actual.children[0].props.className).toEqual('list-group')
-      expect(actual.children[0].props.ref).toEqual('items')
-      for (let liv of actual.children[0].children) {
-        expect(liv.tag).toEqual('li')
-        expect(liv.props.className).toBe('')
-        expect(liv.props.on.click).toBe(comp.didClickItem)
-        expect(liv.children.length).toBe(1)
-        expect(itemSet.has(liv.children[0].text)).toBe(true)
-      }
+      // get ref to actual handlers so they compare equal
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list'><ol className='list-group' ref='items'>
+        <li className='' value='0' on={onHandler}>item1</li>
+        <li className='' value='1' on={onHandler}>item2</li>
+        <li className='' value='2' on={onHandler}>item3</li>
+      </ol></div>
+      expect(actual).toEqual(expected)
     })
 
     it('renders a selected item', () => {
@@ -77,26 +71,15 @@ describe('PkgSelectList component', () => {
           'item1', 'item2', 'item3'
         ]
       })
-      comp.props.selectionIndex = 0
+      comp.selectedIndex = 0
       const actual = comp.render()
-      const itemSet = new Set(['item1', 'item2', 'item3'])
-      // alas, there's no way to use equal to compare these
-      expect(actual.tag).toEqual('div')
-      expect(actual.props.className).toEqual('select-list pkg-select-list')
-      expect(actual.children.length).toBe(1)
-      expect(actual.children[0].tag).toEqual('ol')
-      expect(actual.children[0].props.className).toEqual('list-group')
-      expect(actual.children[0].props.ref).toEqual('items')
-      for (let liv of actual.children[0].children) {
-        expect(liv.tag).toEqual('li')
-        expect(liv.props.on.click).toBe(comp.didClickItem)
-        expect(liv.children.length).toBe(1)
-        expect(itemSet.has(liv.children[0].text)).toBe(true)
-      }
-      // logger.debug(actual.children[0].children[0])
-      expect(actual.children[0].children[0].props.className).toEqual('selected')
-      expect(actual.children[0].children[1].props.className).toEqual('')
-      expect(actual.children[0].children[2].props.className).toEqual('')
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list'><ol className='list-group' ref='items'>
+        <li className='selected' value='0' on={onHandler}>item1</li>
+        <li className='' value='1' on={onHandler}>item2</li>
+        <li className='' value='2' on={onHandler}>item3</li>
+      </ol></div>
+      expect(actual).toEqual(expected)
     })
 
     it('optionally does not select items', () => {
@@ -106,13 +89,15 @@ describe('PkgSelectList component', () => {
         ],
         selectableItems: false
       })
-      comp.props.selectionIndex = 0
+      comp.selectedIndex = 0
       let actual = comp.render()
-      expect(comp.props.selectableItems).toBe(false)
-      expect(comp.props.selectionIndex).toEqual(0)
-      expect(actual.children[0].children[0].props.className).toEqual('')
-      expect(actual.children[0].children[1].props.className).toEqual('')
-      expect(actual.children[0].children[2].props.className).toEqual('')
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list'><ol className='list-group' ref='items'>
+        <li className='' value='0' on={onHandler}>item1</li>
+        <li className='' value='1' on={onHandler}>item2</li>
+        <li className='' value='2' on={onHandler}>item3</li>
+      </ol></div>
+      expect(actual).toEqual(expected)
     })
   })
 
@@ -123,18 +108,22 @@ describe('PkgSelectList component', () => {
           'item1', 'item2', 'item3'
         ]
       })
-      comp.selectFirst().then(() => {
-        expect(comp.props.selectionIndex).toBe(0)
-        let actual = comp.virtualNode
-        expect(actual.children[0].children[0].props.className).toEqual('selected')
-        expect(actual.children[0].children[1].props.className).toEqual('')
-        expect(actual.children[0].children[2].props.className).toEqual('')
-        comp.selectIndex(2).then(() => {
-          actual = comp.virtualNode
-          expect(comp.props.selectionIndex).toBe(2)
-          expect(actual.children[0].children[0].props.className).toEqual('')
+      waitsForPromise(() => {
+        return comp.selectFirst().then(() => {
+          expect(comp.selectedIndex).toBe(0)
+          let actual = comp.virtualNode
+          expect(actual.children[0].children[0].props.className).toEqual('selected')
           expect(actual.children[0].children[1].props.className).toEqual('')
-          expect(actual.children[0].children[2].props.className).toEqual('selected')
+          expect(actual.children[0].children[2].props.className).toEqual('')
+          waitsForPromise(() => {
+            return comp.selectIndex(2).then(() => {
+              actual = comp.virtualNode
+              expect(comp.selectedIndex).toBe(2)
+              expect(actual.children[0].children[0].props.className).toEqual('')
+              expect(actual.children[0].children[1].props.className).toEqual('')
+              expect(actual.children[0].children[2].props.className).toEqual('selected')
+            })
+          })
         })
       })
     })
@@ -150,21 +139,25 @@ describe('PkgSelectList component', () => {
         ],
         on: {change: onChange}
       })
-      comp.selectFirst().then(() => {
-        expect(evts).toEqual(['item1'])
-        let actual = comp.virtualNode
-        expect(comp.props.selectionIndex).toBe(0)
-        expect(actual.children[0].children[0].props.className).toEqual('selected')
-        expect(actual.children[0].children[1].props.className).toEqual('')
-        expect(actual.children[0].children[2].props.className).toEqual('')
-        comp.selectLast().then(() => {
-          expect(evts).toEqual(['item1', 'item3'])
-          actual = comp.virtualNode
-          expect(comp.props.selectionIndex).toBe(2)
-          expect(actual.children[0].children[0].props.className).toEqual('')
+      waitsForPromise(() => {
+        return comp.selectFirst().then(() => {
+          expect(evts).toEqual(['item1'])
+          let actual = comp.virtualNode
+          expect(comp.selectedIndex).toBe(0)
+          expect(actual.children[0].children[0].props.className).toEqual('selected')
           expect(actual.children[0].children[1].props.className).toEqual('')
-          expect(actual.children[0].children[2].props.className).toEqual('selected')
-          expect(evts.length).toBe(2)
+          expect(actual.children[0].children[2].props.className).toEqual('')
+          waitsForPromise(() => {
+            return comp.selectLast().then(() => {
+              expect(evts).toEqual(['item1', 'item3'])
+              actual = comp.virtualNode
+              expect(comp.selectedIndex).toBe(2)
+              expect(actual.children[0].children[0].props.className).toEqual('')
+              expect(actual.children[0].children[1].props.className).toEqual('')
+              expect(actual.children[0].children[2].props.className).toEqual('selected')
+              expect(evts.length).toBe(2)
+            })
+          })
         })
       })
     })
@@ -175,6 +168,7 @@ describe('PkgSelectList component', () => {
       let evts = []
       const onChange = function (item, index) {
         evts.push(item)
+        logger.debug(`onChange got ${item}, ${index}`)
       }
       const comp = new PkgSelectList({
         items: [
@@ -182,30 +176,33 @@ describe('PkgSelectList component', () => {
         ],
         on: {change: onChange}
       })
-      expect(comp.selectionIndex).toBe(undefined)
+      expect(comp.selectedIndex).toBe(null)
+      expect(comp.props.selectableItems).toBe(true)
       // click on item 1
+      logger.debug(`click on index 0`)
       comp.element.children[0].children[0].click()
 
       waitsFor(() => evts.length > 0)
 
       runs(() => {
         expect(evts).toEqual(['item1'])
-        expect(comp.props.selectionIndex).toBe(0)
+        expect(comp.selectedIndex).toBe(0)
         expect(comp.props.selectableItems).toBe(true)
-        let actual = comp.virtualNode
+        let actual = comp.render()  // did not re-render automatically
         expect(actual.children[0].children[0].props.className).toEqual('selected')
         expect(actual.children[0].children[1].props.className).toEqual('')
         expect(actual.children[0].children[2].props.className).toEqual('')
 
         // click on item 3
+        logger.debug(`click on index 2`)
         comp.element.children[0].children[2].click()
 
         waitsFor(() => evts.length > 1)
 
         runs(() => {
           expect(evts).toEqual(['item1', 'item3'])
-          expect(comp.props.selectionIndex).toBe(2)
-          let actual = comp.virtualNode
+          expect(comp.selectedIndex).toBe(2)
+          let actual = comp.render()
           expect(actual.children[0].children[0].props.className).toEqual('')
           expect(actual.children[0].children[1].props.className).toEqual('')
           expect(actual.children[0].children[2].props.className).toEqual('selected')
