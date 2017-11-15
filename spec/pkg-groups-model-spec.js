@@ -9,7 +9,7 @@ import PkgGroupsMeta from '../lib/pkg-groups-meta'
 import MockPackageManager from './atom-packages-mock'
 
 const logger = log4js.getLogger('pkg-groups-model-spec')
-logger.level = 'info'
+logger.level = 'debug'
 
 describe('PkgGroupsModel', () => {
   let model/* PkgGroupsModel */
@@ -226,6 +226,12 @@ describe('PkgGroupsModel', () => {
     it('works for empty model', () => {
       const fred = new PkgGroupsModel()
       expect(fred.serialize()).toEqual({groups: [], metas: [], enabled: [], disabled: [], deserializer: 'PkgGroupsModel'})
+    })
+
+    it('works for complex model', () => {
+      const model4 = new PkgGroupsModel(model3.serialize())
+      model4.addGroup('all_installed', atom.packages.getAvailablePackageNames().filter((x) => !atom.packages.isBundledPackage(x)))
+      logger.debug(JSON.stringify(model4.serialize()))
     })
   })
 
