@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/alflanagan/atom-pkg-groups.svg?branch=master)](https://travis-ci.org/alflanagan/atom-pkg-groups)
 
+Windows: [![Build status](https://ci.appveyor.com/api/projects/status/9xh53hnqxls9gg2c?svg=true)](https://ci.appveyor.com/project/alflanagan/atom-pkg-groups)
+
 This is an [Atom editor](https://atom.io) package to allow you to create groups of packages, and
 enable/disable them all at once.
 
