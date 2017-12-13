@@ -98,7 +98,7 @@ describe('DomDiff', () => {
 
     it('reports extra props in either dom', () => {
       const diff = new DomDiff(<div fred='wilma' />, <div barney='betty' />)
-      expect(diff.toString()).toEqual('Properties found in 1st DOM but not the second: fred\nProperties found in 2nd DOM but not the first: barney')
+      expect(diff.toString()).toEqual('Properties found in 1st DOM (div) but not the second: fred\nProperties found in 2nd DOM but not the first: barney')
     })
 
     it('reports properties with different values', () => {
@@ -113,9 +113,9 @@ describe('DomDiff', () => {
 
     it('recursively reports differences between child nodes', () => {
       const diff = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li>fred</li><li>thomas</li></ul>)
-      expect(diff.toString()).toEqual('The DOMs have differing children at index 1. Differences:\n\tThe DOMs have differing children at index 0. Differences:\n\t\tFirst DOM has text barney, but second has thomas.')
+      expect(diff.toString()).toEqual('The DOMs (ul) have differing children at index 1. Differences:\n\tThe DOMs (li) have differing children at index 0. Differences:\n\t\tFirst DOM has text barney, but second has thomas.')
       const diff2 = new DomDiff(<ul><li>fred</li><li>barney</li></ul>, <ul><li className='betty'>fred</li><li>barney</li></ul>)
-      expect(diff2.toString()).toEqual('The DOMs have differing children at index 0. Differences:\n\tProperties found in 2nd DOM but not the first: className')
+      expect(diff2.toString()).toEqual('The DOMs (ul) have differing children at index 0. Differences:\n\tProperties found in 2nd DOM but not the first: className')
     })
   })
 })
