@@ -46,6 +46,7 @@ describe('PkgPickList', () => {
       expect(ppl.props.leftSelected).toBe(null)
       expect(ppl.props.rightLabel).toEqual('right')
       expect(ppl.props.leftLabel).toEqual('left')
+      expect(ppl.props.className).toEqual('package-pick-list')
     })
   })
 
@@ -69,9 +70,19 @@ describe('PkgPickList', () => {
           {rightList}
         </div>
       </div>
-      expect(dom).toEqual(expected)
+      const element = etch.render(dom)
+      let found = false
+      for (let i = 0; i < element.attributes.length; i++) {
+        if (element.attributes[i].name === 'class') {
+          expect(element.attributes[i].value).toEqual('package-pick-list')
+          found = true
+        }
+      }
+      expect(found).toBe(true)
       const diff = new DomDiff(dom, expected)
-      logger.debug(diff.toString())
+      if (!diff.noDifferences()) {
+        logger.warn(diff.toString())
+      }
       expect(diff.noDifferences()).toBe(true)
     })
 
@@ -99,7 +110,9 @@ describe('PkgPickList', () => {
         </div>
       </div>
       const diff = new DomDiff(dom, expected)
-      logger.debug(diff.toString())
+      if (!diff.noDifferences()) {
+        logger.warn(diff.toString())
+      }
       expect(dom).toEqual(expected)
       expect(diff.noDifferences()).toBe(true)
     })
@@ -223,10 +236,10 @@ describe('PkgPickList', () => {
         on: {change: changeCallback}
       })
 
-      waitsForPromise(() => {
-        return pick.move('right', 'pkg4').then(() => {
-          expect(changeCallback).toHaveBeenCalledWith({data: ['right', 'pkg4']})
-        })
+      pick.move('right', 'pkg4')
+      waitsFor(() => changeCallback.callCount > 0)
+      runs(() => {
+        expect(changeCallback).toHaveBeenCalledWith({data: ['right', 'pkg4']})
       })
     })
   })
