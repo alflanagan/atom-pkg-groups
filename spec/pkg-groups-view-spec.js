@@ -13,7 +13,7 @@ import PkgGroupsView from '../lib/pkg-groups-view'
 const logger = log4js.getLogger('pkg-groups-view-spec')
 logger.level = 'debug'
 
-xdescribe('PkgGroupsView', () => {
+describe('PkgGroupsView', () => {
   describe('constructor', () => {
     it('does not require arguments', () => {
       let fred = new PkgGroupsView()
@@ -54,22 +54,12 @@ xdescribe('PkgGroupsView', () => {
         <atom-panel id='group-select-panel'>
           <div id='pkg-groups-upper-panel' className='inset-panel padded'>
             <h1>Set Up Package Groups</h1>
-            <div className='inset-panel padded'>
-              <div id='defined-groups-panel'>
-                <div id='group-select-list'>
-                  <PkgSelectList items={view.props.groups} on={{change: view._didSelectGroup}} />
-                  <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
-                  <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
-                </div>
-                <div id='specify-groups-panel'>
-                  <div className='sub-section installed-packages'>
-                    <PkgPickList leftList={view.props.available} rightList={view.props.selected} id='pkg-groups-group-pick'
-                      leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: view._didChange}} />
-                    <p>Click Package Name to Select/Deselect</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PkgSelectList id='groups-select-list' items={view.props.groups} on={{change: view._didSelectGroup}} />
+            <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
+            <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
+            <PkgPickList leftList={view.props.available} rightList={view.props.selected} id='pkg-groups-group-pick'
+              leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: view._didChange}} />
+            <p className='group-select-hint'>Click Package Name to Select/Deselect</p>
           </div>
           <div id='pkg-groups-lower-panel' className='inset-panel padded'>
             <div id='defined-metas-panel'>
@@ -113,22 +103,12 @@ xdescribe('PkgGroupsView', () => {
         <atom-panel id='group-select-panel'>
           <div id='pkg-groups-upper-panel' className='inset-panel padded'>
             <h1>Set Up Package Groups</h1>
-            <div className='inset-panel padded'>
-              <div id='defined-groups-panel'>
-                <div id='group-select-list'>
-                  <PkgSelectList items={tgroups} on={{change: pkgView._didSelectGroup}} />
-                  <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
-                  <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
-                </div>
-                <div id='specify-groups-panel'>
-                  <div className='sub-section installed-packages'>
-                    <PkgPickList leftList={tavailable} rightList={pkgView.props.selected} id='pkg-groups-group-pick'
-                      leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: pkgView._didChange}} />
-                    <p>Click Package Name to Select/Deselect</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PkgSelectList id='groups-select-list' items={tgroups} on={{change: pkgView._didSelectGroup}} />
+            <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
+            <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
+            <PkgPickList leftList={tavailable} rightList={tselected} id='pkg-groups-group-pick'
+              leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: pkgView._didChange}} />
+            <p className='group-select-hint'>Click Package Name to Select/Deselect</p>
           </div>
           <div id='pkg-groups-lower-panel' className='inset-panel padded'>
             <div id='defined-metas-panel'>
@@ -172,7 +152,8 @@ xdescribe('PkgGroupsView', () => {
       })
       const parent = document.createElement('div')
       parent.appendChild(etch.render(pkgView))
-      const leftElem = pkgView.element.querySelector('#group-select-list>div>ol').children[1]
+      logger.debug(pkgView.element.querySelector('#groups-select-list'))
+      const leftElem = pkgView.element.querySelector('#groups-select-list>ol').children[1]
       expect(leftElem).toBeInstanceOf(global.HTMLLIElement)
       expect(leftElem.innerText).toEqual('Wolfpack')
       const index = global.parseInt(leftElem.attributes.item(0).value)
@@ -184,22 +165,12 @@ xdescribe('PkgGroupsView', () => {
         <atom-panel id='group-select-panel'>
           <div id='pkg-groups-upper-panel' className='inset-panel padded'>
             <h1>Set Up Package Groups</h1>
-            <div className='inset-panel padded'>
-              <div id='defined-groups-panel'>
-                <div id='group-select-list'>
-                  <PkgSelectList items={tgroups} on={{change: pkgView._didSelectGroup}} />
-                  <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
-                  <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
-                </div>
-                <div id='specify-groups-panel'>
-                  <div className='sub-section installed-packages'>
-                    <PkgPickList leftList={tavailable} rightList={pkgView.props.selected} id='pkg-groups-group-pick'
-                      leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: pkgView._didChange}} />
-                    <p>Click Package Name to Select/Deselect</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PkgSelectList id='groups-select-list' items={tgroups} on={{change: pkgView._didSelectGroup}} />
+            <button id='groups-add-group' name='add-group' type='button' ><i class='fa fa-plus-circle' aria-hidden='true' /></button>
+            <button id='groups-delete-group' name='delete-group' type='button' ><i class='fa fa-minus-circle' aria-hidden='true' /></button>
+            <PkgPickList leftList={tavailable} rightList={tselected} id='pkg-groups-group-pick'
+              leftLabel='Packages Available' rightLabel='Packages In Group' on={{change: pkgView._didChange}} />
+            <p className='group-select-hint'>Click Package Name to Select/Deselect</p>
           </div>
           <div id='pkg-groups-lower-panel' className='inset-panel padded'>
             <div id='defined-metas-panel'>
@@ -219,7 +190,6 @@ xdescribe('PkgGroupsView', () => {
           </div>
         </atom-panel>
       </div>
-
       expect(actual).toEqual(expected)
       const diff = new DomDiff(actual, expected)
       if (!diff.noDifferences()) {
