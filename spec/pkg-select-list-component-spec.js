@@ -99,6 +99,26 @@ describe('PkgSelectList component', () => {
       </ol></div>
       expect(actual).toEqual(expected)
     })
+
+    it('honors an ID property', () => {
+      const comp = new PkgSelectList({
+        items: [
+          'item1', 'item2', 'item3'
+        ],
+        selectableItems: false,
+        id: 'my-special-list'
+      })
+      let actual = comp.render()
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list' id='my-special-list'>
+        <ol className='list-group' ref='items'>
+          <li className='' value='0' on={onHandler}>item1</li>
+          <li className='' value='1' on={onHandler}>item2</li>
+          <li className='' value='2' on={onHandler}>item3</li>
+        </ol>
+      </div>
+      expect(actual).toEqual(expected)
+    })
   })
 
   describe('selectIndex', () => {
