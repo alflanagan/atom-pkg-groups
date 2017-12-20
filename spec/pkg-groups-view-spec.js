@@ -11,7 +11,7 @@ import PkgTristateList from '../lib/pkg-tristate-list-component'
 import PkgGroupsView from '../lib/pkg-groups-view'
 
 const logger = log4js.getLogger('pkg-groups-view-spec')
-logger.level = 'debug'
+logger.level = 'info'
 
 describe('PkgGroupsView', () => {
   describe('constructor', () => {
@@ -82,7 +82,7 @@ describe('PkgGroupsView', () => {
       expect(dom).toEqual(expected)
       const diff = new DomDiff(dom, expected)
       if (!diff.noDifferences()) {
-        logger.debug(diff.toString())
+        logger.warn(diff.toString())
       }
       expect(diff.noDifferences()).toBe(true)
     })
@@ -130,7 +130,7 @@ describe('PkgGroupsView', () => {
       </div>
       const diff = new DomDiff(actual, expected)
       if (!diff.noDifferences()) {
-        logger.debug(diff.toString())
+        logger.warn(diff.toString())
       }
       expect(actual).toEqual(expected)
     })
@@ -190,11 +190,11 @@ describe('PkgGroupsView', () => {
           </div>
         </atom-panel>
       </div>
-      expect(actual).toEqual(expected)
       const diff = new DomDiff(actual, expected)
       if (!diff.noDifferences()) {
         logger.warn(diff.toString())
       }
+      expect(actual).toEqual(expected)
       expect(mySpy).toHaveBeenCalled()
       expect(mySpy.calls[0].args).toEqual([leftElem.innerText, index])
     })
