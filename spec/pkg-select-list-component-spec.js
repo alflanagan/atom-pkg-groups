@@ -119,6 +119,48 @@ describe('PkgSelectList component', () => {
       </div>
       expect(actual).toEqual(expected)
     })
+
+    it('honors a className property', () => {
+      const comp = new PkgSelectList({
+        items: [
+          'item1', 'item2', 'item3'
+        ],
+        selectableItems: false,
+        className: 'CSC101 PSY322'
+      })
+      let actual = comp.render()
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list CSC101 PSY322'>
+        <ol className='list-group' ref='items'>
+          <li className='' value='0' on={onHandler}>item1</li>
+          <li className='' value='1' on={onHandler}>item2</li>
+          <li className='' value='2' on={onHandler}>item3</li>
+        </ol>
+      </div>
+      expect(actual).toEqual(expected)
+    })
+
+    it('passes arbitrary properties through to top-level element', () => {
+      const comp = new PkgSelectList({
+        items: [
+          'item1', 'item2', 'item3'
+        ],
+        selectableItems: false,
+        fred: 'wilma',
+        barney: 'betty',
+        six: 7
+      })
+      let actual = comp.render()
+      const onHandler = actual.children[0].children[0].props.on
+      const expected = <div className='select-list pkg-select-list' fred='wilma' barney='betty' six='7'>
+        <ol className='list-group' ref='items'>
+          <li className='' value='0' on={onHandler}>item1</li>
+          <li className='' value='1' on={onHandler}>item2</li>
+          <li className='' value='2' on={onHandler}>item3</li>
+        </ol>
+      </div>
+      expect(actual).toEqual(expected)
+    })
   })
 
   describe('selectIndex', () => {
