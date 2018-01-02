@@ -21,6 +21,15 @@
     border-width: 2px;
   }
 
+  .pkg-select-list {
+    padding-top: 5px;
+    padding-left: 15px;
+    padding-bottom: 5px;
+    padding-right: 15px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
   #pkg-groups-upper-panel {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
@@ -95,14 +104,11 @@
       padding: 15px;
 
       .pkg-select-list {
-        padding: 20px;
         border-style: groove;
         border-color: 555;
         border-width: 3px;
-        min-height: 300px;
-        max-height: 300px;
-        overflow-x: hidden;
-        overflow-y: scroll;
+        min-height: 250px;
+        max-height: 250px;
       }
 
       .pick-list-left-list {
@@ -116,7 +122,6 @@
           grid-column-end: 5;
           grid-row-start: 2;
           grid-row-end: 3;
-          padding: 20px;
         }
       }
 
