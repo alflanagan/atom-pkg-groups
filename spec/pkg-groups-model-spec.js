@@ -1,6 +1,7 @@
 /** @babel */
 
 /* eslint-env jasmine */
+import fs from 'fs'
 import log4js from 'log4js'
 import Immutable from 'immutable'
 import PkgGroupsModel from '../lib/pkg-groups-model'
@@ -9,7 +10,7 @@ import PkgGroupsMeta from '../lib/pkg-groups-meta'
 import MockPackageManager from './atom-packages-mock'
 
 const logger = log4js.getLogger('pkg-groups-model-spec')
-logger.level = 'debug'
+logger.level = 'warn'
 
 describe('PkgGroupsModel', () => {
   let model/* PkgGroupsModel */
@@ -177,27 +178,21 @@ describe('PkgGroupsModel', () => {
     })
 
     it('can deserialize', () => {
-      let mjson = `{"groups":[{"type":"group",
-                               "name":"group1",
-                               "packages":["fred","sally","barney"],
-                               "deserializer":"PkgGroupsGroup"},
-                               {"type":"group",
-                               "name":"group2",
-                               "packages":["frank","tom","dick","harry"],
-                               "deserializer":"PkgGroupsGroup"}],
-                    "metas":[{"type":"meta",
-                              "name":"meta1",
-                              "states":{"group1":"enabled","group2":"enabled"},
-                              "deserializer":"PkgGroupsMeta"}],
-                    "enabled":["group1", "meta1"],
-                    "disabled":["group2"],
-                    "deserializer":"PkgGroupsModel"}`
-      let s = JSON.parse(mjson)
+      const rawdata = fs.readFileSync('spec/fixtures/test_model1.json')
+      let s = JSON.parse(rawdata)
       let model = new PkgGroupsModel(s)
-      expect(model.groups.size).toBe(2)
-      expect(model.metas.size).toBe(1)
-      expect(model.enabled).toEqual(new Immutable.Set(['group1', 'meta1']))
-      expect(model.disabled).toEqual(new Immutable.Set(['group2']))
+      expect(model.groups.size).toBe(5)
+      expect(model.metas.size).toBe(2)
+      expect(model.enabled).toEqual(new Immutable.Set(['Web Programming']))
+      expect(model.disabled).toEqual(new Immutable.Set(['python']))
+      expect(model.isMeta('systems')).toBe(true)
+      expect(model.isGroup('javascript')).toBe(true)
+      const group = model.group('system languages')
+      expect(group).toBeInstanceOf(PkgGroupsGroup)
+      expect(group.size).toBe(7)
+      const meta = model.group('systems')
+      expect(meta).toBeInstanceOf(PkgGroupsMeta)
+      expect(meta.stateOf('javascript')).toEqual('disabled')
     })
   })
 

@@ -1,0 +1,70 @@
+{
+  "groups": [{
+    "type": "group",
+    "name": "python",
+    "packages": ["Hydrogen", "autocomplete-python", "python-snippets", "django-templates", "MagicPython",
+      "python-tools", "script", "linter", "linter-pycodestyle", "linter-pydocstyle"
+    ],
+    "deserializer": "PkgGroupsGroup"
+  }, {
+    "type": "group",
+    "name": "javascript",
+    "packages": ["linter-js-standard", "linter-coffeescript", "linter", "language-babel", "source-preview",
+      "standard-formatter", "docblockr"
+    ],
+    "deserializer": "PkgGroupsGroup"
+  }, {
+    "type": "group",
+    "name": "system languages",
+    "packages": ["language-forth", "linter-gcc", "language-ini", "language-csharp", "language-go", "go-plus", "linter-golinter"],
+    "deserializer": "PkgGroupsGroup"
+  }, {
+    "type": "group",
+    "name": "always_enabled",
+    "packages": ["export-html", "minimap", "linter-ui-default", "atom-notes", "intentions", "minimap-git-diff",
+      "disable-keybindings", "last-cursor-position", "autocomplete-paths", "Sublime-Style-Column-Selection",
+      "file-icons", "editorconfig", "sort-lines", "linter", "atom-keyboard-macros", "clipboard-plus", "flex-tool-bar",
+      "advanced-open-file", "git-plus", "custom-folds", "project-manager", "open-unsupported-files", "busy-signal",
+      "tool-bar"
+    ],
+    "deserializer": "PkgGroupsGroup"
+  }, {
+    "type": "group",
+    "name": "all_installed",
+    "packages": ["language-powershell", "Hydrogen", "autocomplete-python", "linter-js-standard", "export-html",
+      "atom-live-grammar-reload", "minimap", "linter-ui-default", "atom-notes", "python-snippets", "linter-tidy",
+      "intentions", "django-templates", "minimap-git-diff", "linter-jsonlint", "language-forth", "disable-keybindings",
+      "ide-typescript", "grammar-mode", "last-cursor-position", "MagicPython", "pristine-ui", "autocomplete-paths",
+      "Sublime-Style-Column-Selection", "file-icons", "python-tools", "linter-gcc", "script", "jumpy", "linter-phpcs",
+      "language-generic-config", "autoclose-html", "language-svg", "editorconfig", "language-ini", "sort-lines", "linter",
+      "atom-keyboard-macros", "clipboard-plus", "flex-tool-bar", "atom-ide-ui", "emmet", "language-mips", "linter-coffeescript",
+      "advanced-open-file", "language-babel", "git-plus", "linter-shellcheck", "ide-php", "source-preview",
+      "linter-less", "custom-folds", "pure-syntax", "language-utl", "project-manager", "standard-formatter", "atom-beautify",
+      "open-unsupported-files", "busy-signal", "docblockr", "process-palette", "symbol-quick-pane", "linter-xmllint",
+      "linter-pycodestyle", "tool-bar", "svg-preview", "linter-pydocstyle"
+    ],
+    "deserializer": "PkgGroupsGroup"
+  }],
+  "metas": [{
+    "type": "meta",
+    "name": "Web Programming",
+    "states": {
+      "always_enabled": "enabled",
+      "javascript": "enabled",
+      "system languages": "disabled"
+    },
+    "deserializer": "PkgGroupsMeta"
+  }, {
+    "type": "meta",
+    "name": "systems",
+    "states": {
+      "always_enabled": "enabled",
+      "javascript": "disabled",
+      "system languages": "enabled"
+    },
+    "deserializer": "PkgGroupsMeta"
+  }],
+  "enabled": ["Web Programming"],
+  "disabled": ["python"],
+  "deserializer": "PkgGroupsModel"
+}
