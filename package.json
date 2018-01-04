@@ -23,12 +23,11 @@
     "ramda": "^0.25.0"
   },
   "deserializers": {
-    "pkg-groups/PkgGroupsView": "deserializePkgGroupsView",
     "pkg-groups/PkgGroupsModel": "deserializePkgGroupsModel"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.0.3",
+    "babel-eslint": "^8.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "esdoc": "^1.0.4",
@@ -38,8 +37,7 @@
     "standard": "^10.0.3"
   },
   "scripts": {
-    "test": "standard;  apm-beta test -p /usr/bin/atom-beta",
-    "make-tar": "rm -f pkg-groups.tar pkg-groups.tar.gz; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -name babel-transpile -prune -o -type f -print); gzip pkg-groups.tar",
+    "make-tar": "rm -f pkg-groups.tar pkg-groups.tar.gz; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -name babel-transpile -prune -o ! -name package-lock.json -a -type f -print); gzip pkg-groups.tar",
     "make-docs": "rm -rf docs/*; esdoc"
   },
   "standard": {
