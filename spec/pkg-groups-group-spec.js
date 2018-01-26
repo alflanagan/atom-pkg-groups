@@ -13,20 +13,20 @@ describe('PkgGroupsGroup', () => {
   const pkgList = ['pkg-groups', 'MagicPython', 'project-manager']
 
   beforeEach(() => {
-    betty = new PkgGroupsGroup('test1', pkgList)
+    betty = new PkgGroupsGroup({name: 'test1', packages: pkgList, type: 'group', deserializer: 'pkgGroupsGroup'})
   })
 
   it('has a name', () => {
-    let fred = new PkgGroupsGroup('fred', [])
+    let fred = new PkgGroupsGroup({name: 'fred', packages: [], type: 'group'})
     expect(fred.name).toBe('fred')
   })
 
   it('has a list of packages', () => {
     expect(betty.name).toBe('test1')
-    expect(betty.packages).toEqual(new Immutable.Set(pkgList))
-    for (let pkg of pkgList) {
+    for (const pkg of pkgList) {
       expect(betty.has(pkg))
     }
+    expect(betty.size).toEqual(pkgList.length)
   })
 
   it('serializes', () => {
@@ -37,6 +37,7 @@ describe('PkgGroupsGroup', () => {
     expect(data['type']).toEqual('group')
     expect(data['name']).toEqual('test1')
     expect(data['packages']).toContain('pkg-groups')
+    expect(data['deserializer']).toEqual('PkgGroupsGroup')
   })
 
   it('can call a function with each package', () => {
