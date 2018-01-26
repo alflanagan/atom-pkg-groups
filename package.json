@@ -16,7 +16,6 @@
     "atom": ">=1.19.0 <2.0.0"
   },
   "dependencies": {
-    "babel-plugin-transform-jsx": "^2.0.0",
     "etch": "^0.12.7",
     "immutable": "~3.8.1",
     "log4js": "^2.4.1",
@@ -29,6 +28,7 @@
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-jsx": "^2.0.0",
     "babel-preset-env": "^1.6.1",
     "esdoc": "^1.0.4",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
@@ -42,13 +42,6 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "parserOptions": {
-      "ecmaVersion": 2017,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
     "env": {
       "jasmine": true,
       "browser": true,
@@ -63,6 +56,11 @@
     }
   },
   "babel": {
+    "ecmaVersion": 2017,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
     "presets": [
       "env"
     ],
