@@ -16,9 +16,9 @@
     "atom": ">=1.19.0 <2.0.0"
   },
   "dependencies": {
-    "etch": "^0.12.7",
+    "etch": "^0.12.8",
     "immutable": "~3.8.1",
-    "log4js": "^2.4.1",
+    "log4js": "^2.5.2",
     "ramda": "^0.25.0"
   },
   "deserializers": {
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.1.2",
+    "babel-eslint": "^8.2.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-jsx": "^2.0.0",
     "babel-preset-env": "^1.6.1",
