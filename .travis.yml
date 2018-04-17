@@ -1,5 +1,5 @@
 ### Project specific config ###
-language: generic
+language: node_js
 
 env:
   global:
@@ -14,7 +14,7 @@ os:
   - linux
   ## - osx
 
-dist: trusty
+dist: precise
 
 ### Generic setup follows ###
 script:
@@ -43,3 +43,7 @@ addons:
     - git
     - libsecret-1-dev
     - fakeroot
+
+cache:
+  directories:
+    - "node_modules"
