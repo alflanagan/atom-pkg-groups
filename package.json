@@ -16,7 +16,7 @@
     "atom": ">=1.19.0 <2.0.0"
   },
   "dependencies": {
-    "etch": "^0.12.8",
+    "etch": "^0.14.0",
     "immutable": "~3.8.1",
     "log4js": "^2.5.2",
     "ramda": "^0.25.0"
@@ -26,15 +26,17 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.1",
+    "babel-eslint": "^8.2.3",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-jsx": "^2.0.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
     "esdoc": "^1.0.4",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-jsx-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "standard": "^10.0.3"
+    "flow-bin": "^0.70.0",
+    "standard": "^11.0.0"
   },
   "scripts": {
     "make-tar": "rm -f pkg-groups.tar pkg-groups.tar.gz; tar cf pkg-groups.tar $(find . -name .git -prune -o -name node_modules -prune -o -name docs -prune -o -name babel-transpile -prune -o ! -name package-lock.json -a -type f -print); gzip pkg-groups.tar",
@@ -56,13 +58,14 @@
     }
   },
   "babel": {
-    "ecmaVersion": 2018,
+    "ecmaVersion": 2017,
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
     },
     "presets": [
-      "env"
+      "env",
+      "flow"
     ],
     "plugins": [
       "transform-jsx",
