@@ -184,7 +184,7 @@ describe('PkgPickList', () => {
 
       const pkg5Li = newElem.querySelector('.pick-list-left-list ol.list-group').children[1]
       expect(pkg5Li.tagName).toEqual('LI')
-      expect(pkg5Li.innerHTML).toEqual('pkg5')  // got the right element
+      expect(pkg5Li.innerHTML).toEqual('pkg5') // got the right element
       pkg5Li.click()
       waitsFor(() => changeCallback.calls.length === 1)
       runs(() => {
@@ -202,7 +202,7 @@ describe('PkgPickList', () => {
 
       const pkg2Li = newElem.querySelector('.pick-list-right-list ol.list-group').children[1]
       expect(pkg2Li.tagName).toEqual('LI')
-      expect(pkg2Li.innerHTML).toEqual('pkg2')  // got the right element
+      expect(pkg2Li.innerHTML).toEqual('pkg2') // got the right element
       pkg2Li.click()
       waitsFor(() => changeCallback2.calls.length === 1)
       runs(() => {

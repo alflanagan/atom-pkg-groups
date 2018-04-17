@@ -2,7 +2,6 @@
 
 /* eslint-env jasmine */
 import log4js from 'log4js'
-import Immutable from 'immutable'
 import PkgGroupsGroup from '../lib/pkg-groups-group'
 
 const logger = log4js.getLogger('pkg-groups-group-spec')

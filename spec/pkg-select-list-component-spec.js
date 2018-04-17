@@ -250,7 +250,7 @@ describe('PkgSelectList component', () => {
         expect(evts).toEqual(['item1'])
         expect(comp.selectedIndex).toBe(0)
         expect(comp.props.selectableItems).toBe(true)
-        let actual = comp.render()  // did not re-render automatically
+        let actual = comp.render() // did not re-render automatically
         expect(actual.children[0].children[0].props.className).toEqual('selected')
         expect(actual.children[0].children[1].props.className).toEqual('')
         expect(actual.children[0].children[2].props.className).toEqual('')
