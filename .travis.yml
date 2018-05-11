@@ -14,7 +14,7 @@ os:
   - linux
   ## - osx
 
-dist: precise
+dist: trusty
 
 ### Generic setup follows ###
 script:
